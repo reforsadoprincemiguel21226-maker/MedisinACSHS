@@ -1,4 +1,4 @@
-const { handleChat } = require('../kiosk-server.js');
+const { handleChat } = require('../lib/server-core.js');
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {

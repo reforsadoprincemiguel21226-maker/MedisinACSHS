@@ -50,3 +50,7 @@ The admin document store uses the application's local filesystem. Vercel Functio
 3. Commit and push.
 4. Vercel should automatically create a new deployment.
 5. Open the production URL and test `/` and then the assistant.
+
+
+## FINAL5 Vercel architecture note
+The Vercel deployment uses only /api Node Functions and static root files. The backend implementation lives in lib/server-core.js; no root Node server entrypoint or package start script is used, preventing Vercel from misclassifying the backend as a standalone server.
