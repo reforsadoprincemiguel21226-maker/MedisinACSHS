@@ -10,6 +10,9 @@
 // Filipino/Taglish terms since the school population is mixed-language.
 
 const TOPIC_KEYWORDS = {
+  cpr: [
+    "cpr", "cardiopulmonary resuscitation", "cardiac arrest", "heart stopped", "not breathing and unconscious",
+  ],
   severe_bleeding: [
     "severe bleeding", "heavy bleeding", "bleeding heavily", "profuse bleeding", "bleeding a lot", "bleeding badly",
     "won't stop bleeding", "wont stop bleeding", "malakas na dumudugo", "ang lakas ng dugo", "malakas ang dugo",
@@ -98,8 +101,17 @@ const TOPIC_KEYWORDS = {
     "small cut", "minor cut", "small wound", "cut", "wound", "maliit akong sugat", "maliit na sugat", "scratch", "scrape", "cut myself",
     "sugat", "gasgas", "nasugatan ng kaunti", "bleeding", "blood", "dugo", "dumudugo", "splinter", "tinik", "tinikan",
   ],
+  dislocation: [
+    "dislocation", "dislocated", "joint out of place", "joint popped out", "shoulder popped out", "shoulder dislocation", "dislocated shoulder", "balik sa joint", "na-dislocate", "dislocate", "na dislocate",
+  ],
+  fracture: [
+    "fracture", "fractured", "broken bone", "broken bones", "broken arm", "broken leg", "broken wrist", "broken ankle", "broken finger", "broken hand", "broken foot", "broke my bone", "broke my arm", "broke my leg", "broke my wrist", "broke my ankle", "broke my finger", "broke my hand", "broke my foot", "bone is broken", "bali ang buto", "nabali ang buto", "nabali", "bali",
+  ],
+  sprain: [
+    "sprain", "sprained", "sprain injury", "pilay", "napilay", "na-sprain",
+  ],
   injury: [
-    "sprain", "sprained", "fracture", "fractured", "bali", "nabali",
+    "injured", "injury", "twisted my ankle",
     "injured", "injury", "broke", "broken", "twisted my ankle", "napilay",
   ],
   fever: [
@@ -145,8 +157,6 @@ const GENERIC_MEDICAL_WORDS = [
 const CASUAL_PHRASES = [
   "thanks", "thank you", "thx", "ty", "thank u", "salamat", "maraming salamat", "salamat po",
   "okay", "ok", "okey", "alright", "all right", "got it", "understood", "noted", "okay na", "ok na", "sige", "gets", "gets ko",
-  "yes", "yeah", "yep", "yup", "sure", "correct", "right", "exactly", "oo", "opo", "tama",
-  "no", "nope", "nah", "not really", "no thanks", "hindi", "ayoko", "hindi po",
   "good", "nice", "great", "awesome", "amazing", "perfect", "excellent", "cool", "sweet", "nice one", "ayos", "astig", "solid", "goods",
   "wow", "whoa", "grabe", "ang lupit", "sorry", "my bad", "my mistake", "sorry po", "pasensya", "pasensya na",
   "bye", "goodbye", "see you", "see ya", "later", "talk later", "gotta go", "alis na ako", "bye po",

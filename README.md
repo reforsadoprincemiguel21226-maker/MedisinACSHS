@@ -400,3 +400,47 @@ The assistant now keeps a compact session-memory snapshot separate from RAG. RAG
 Casual/uncategorized turns no longer erase the active situation. This prevents short conversational messages such as “no bro” from destroying an established medical context. A new medical topic can replace the active topic while the previous situation is retained as a suspended snapshot.
 
 The memory layer contains structured state, not hidden chain-of-thought or diagnoses. It is intended to become the compact context supplied to Ollama/cloud AI later, so the AI does not need the entire transcript to preserve continuity.
+
+## Medical coverage hardening — FINAL10
+
+FINAL10 keeps the deterministic safety layer authoritative and expands the curated medical guidance coverage before any optional AI/Ollama communication layer is used.
+
+### Injury and emergency coverage
+The deterministic guidance layer now has explicit entries for:
+- minor cuts and wounds
+- severe/uncontrolled bleeding
+- burns
+- bumps, sprains, and strains
+- suspected fractures / broken bones
+- suspected dislocations
+- nosebleeds
+- eye irritation/foreign material
+- chemical exposure
+- head injury
+- possible head/neck/spinal injury
+- choking
+- seizures
+- fainting/unresponsiveness
+- breathing difficulty
+- chest pain
+- allergic reactions
+- heat illness and cold exposure
+- CPR / cardiac arrest response
+- common symptom support (headache, dizziness, nausea, fever, cough, sore throat, stomach pain, diarrhea, weakness, fatigue, sleepiness, rash, palpitations, anxiety)
+
+### CPR
+CPR guidance is deterministic and step-ordered. For teen/adult cardiac arrest it covers scene safety, responsiveness/breathing check, calling 911, obtaining an AED, chest compressions at 100–120/min, recoil/minimizing interruptions, and following AED prompts. Emergency cases remain emergency-first and are not downgraded to ordinary CPR information.
+
+### Fractures and dislocations
+The system recognizes common language such as "broken arm", "broke my arm", "fracture", "dislocated shoulder", and similar phrases. Guidance emphasizes keeping the area still, not straightening or reducing the injury, bleeding/open-wound precautions, appropriate cold-pack use, urgent assessment, and emergency warning signs.
+
+### Individual kit-item guidance
+Every one of the 18 physical kit items has an individually addressable purpose and basic use sequence. The assistant can answer questions such as "What is gauze for?", "How do I use the triangular bandage?", or "What is the thermal blanket for?" without dumping the entire inventory.
+
+The 18 items remain authoritative from `data/kit.js`.
+
+### Source basis for safety-critical guidance
+Safety-critical CPR and musculoskeletal guidance was cross-checked against current American Heart Association and American Red Cross first-aid/CPR materials during the FINAL10 hardening pass. The project still does not diagnose or prescribe medication.
+
+### Ollama live testing
+The repository includes `test-ollama-live.js`. The test runs automatically when an Ollama server is reachable at the configured local endpoint and the configured model is available. In environments where Ollama is not installed/running, the test is intentionally reported as SKIPPED rather than failing the deterministic suite.

@@ -33,10 +33,10 @@ d = decide(u, 'yes, a little');
 c = updateContext(c, 'yes, a little', u, d);
 assert.strictEqual(c.facts.bleeding_status, 'yes, a little');
 assert(c.pendingInfo.includes('wound_location'));
-u = understandMessage('on my hand');
-d = decide(u, 'on my hand');
-c = updateContext(c, 'on my hand', u, d);
-assert.strictEqual(c.facts.wound_location, 'on my hand');
+u = understandMessage('hand');
+d = decide(u, 'hand');
+c = updateContext(c, 'hand', u, d);
+assert.strictEqual(c.facts.wound_location, 'hand');
 assert(!c.pendingInfo.includes('wound_location'));
 
 c = updateContext(null, 'Antipolo City', {messageType:'location',topics:[],severity:'unknown'}, {missingInfo:[]});

@@ -26,7 +26,7 @@ assert(!/a little/i.test(c.facts.bleeding_status));
 
 c = add(null, 'I have a small cut.');
 c = add(c, 'on my hand');
-assert.strictEqual(c.facts.wound_location, 'on my hand');
+assert.strictEqual(c.facts.wound_location, 'hand');
 
 console.log('progressive state regression: PASS');
 

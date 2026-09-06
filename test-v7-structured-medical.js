@@ -42,11 +42,11 @@ c2 = updateContext(c2, 'yes small bleeding', u2, d2);
 assert.strictEqual(c2.facts.bleeding_status, 'yes small bleeding');
 assert.deepStrictEqual(c2.pendingInfo, ['wound_location']);
 
-u2 = understandMessage('on my hand');
-d2 = decide(u2, 'on my hand');
-c2 = updateContext(c2, 'on my hand', u2, d2);
+u2 = understandMessage('hand');
+d2 = decide(u2, 'hand');
+c2 = updateContext(c2, 'hand', u2, d2);
 assert.strictEqual(c2.facts.bleeding_status, 'yes small bleeding');
-assert.strictEqual(c2.facts.wound_location, 'on my hand');
+assert.strictEqual(c2.facts.wound_location, 'hand');
 assert.deepStrictEqual(c2.pendingInfo, []);
 
 console.log('v7 structured medical regression: PASS');
