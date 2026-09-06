@@ -61,5 +61,20 @@ async function run(turns, port) {
   assert.doesNotMatch(bleeding.replies[3],/Is the wound bleeding right now/i);
   assert.match(bleeding.replies[3],/pressure|gauze|bleeding/i);
 
+
+  const palm=await run([
+    'I cut my palm while opening a can.',
+    'It is bleeding a little, but I can control it.',
+    'What in the kit can I use for that?',
+    'Okay. How do I use it?',
+    'What should I do now?'
+  ],3146);
+  assert.strictEqual(palm.memory.conversationSummary.knownFacts.wound_location,'palm');
+  assert.strictEqual(palm.memory.conversationSummary.knownFacts.bleeding_status,'still bleeding');
+  assert.match(palm.replies[2],/Sterile Gauze Pads|Adhesive Bandage/i);
+  assert.match(palm.replies[3],/How to use it|Place clean gauze|direct pressure/i);
+  assert.match(palm.replies[4],/pressure|gauze|bleeding/i);
+  assert.doesNotMatch(palm.replies[4],/Is the wound bleeding right now/i);
+
   console.log('conversation continuity regressions: PASS');
 })().catch(err=>{ console.error(err); process.exitCode=1; });

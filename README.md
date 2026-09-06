@@ -191,18 +191,35 @@ unless the user-facing wording genuinely needs them.
 Do not say "the person" unless the user has established that someone else is the patient.
 
 ## 9. Response-generation / Ollama contract
-The final kiosk release prioritizes **fast, deterministic, safety-controlled medical responses**. The current medical response path does not require Ollama, so the kiosk remains usable when Ollama is unavailable and does not incur model startup/latency on routine first-aid questions.
+The target architecture is an **AI-assisted communication pipeline**, not a template rewriter:
 
-The structured pipeline remains authoritative for:
-- severity;
-- emergency status;
-- diagnosis boundaries;
-- medication/dosage boundaries;
-- hospital selection;
-- kit contents;
-- supported medical facts.
+```text
+User message
+  ↓
+Session memory / context
+  ↓
+Medical understanding
+  ↓
+Deterministic safety decision
+  ↓
+Approved knowledge + RAG retrieval
+  ↓
+Communication brief
+  ↓
+Qwen through Ollama
+  ↓
+Output safety validator
+  ↓
+Natural user-facing reply
+```
 
-Ollama configuration and the live integration regression test are retained for development/extension of the communication layer, but deterministic responses are the production fallback and current default. A live Ollama test is only evidence when Ollama and the configured model are actually running.
+The deterministic layers remain authoritative for severity, emergency status, first-aid actions, medication boundaries, kit contents, and hospital lookup. RAG supplies grounded reference material; it cannot authorize a new treatment or override structured guidance. Qwen decides wording, emphasis, continuity, and conversational flow within that approved envelope.
+
+Routine medical turns use the AI communication layer when Ollama is available. If the model is unavailable, times out, or fails validation, the server falls back to a deterministic response. Emergency handling, medication boundaries, hospital lookup, and targeted kit facts remain deterministic regardless of model availability.
+
+The AI brief contains the latest message, current intent/goal, established facts, pending information, approved guidance, current safety actions, approved kit items, retrieved knowledge, previous guidance, and a bounded recent-turn window. It does not contain hidden chain-of-thought.
+
+The output validator checks for prohibited medication/dosage/diagnosis content, topic drift, and omission of required safety concepts. A model response that fails validation is discarded rather than shown to the user.
 
 ## 10. Medical language policy
 For **casual conversation**, Filipino or relaxed Taglish is acceptable.
@@ -332,7 +349,7 @@ Prefer coverage by failure mode:
 
 When a test fails, capture the exact conversation and trace it through the pipeline.
 
-## 18. Current interaction-state refinement
+### Current interaction-state refinement
 The pending-question contract is explicit: an assistant follow-up question is part of the active situation. The next user turn must first be checked as a possible answer to that pending question before it is treated as a new standalone intent.
 
 For sleepiness, the initial statement (for example `I feel sleepy`) must not satisfy its own `symptom_context` question. Answers such as `no`, `I slept badly last night`, `usual`, or `sleepier than normal` are eligible updates to the pending context.
@@ -342,13 +359,33 @@ For evolving wound states, the latest bleeding statement replaces the previous b
 This rule is a regression requirement, not an optional conversational enhancement.
 
 ## 18. Current validation notes
-Pure deterministic tests and API tests are useful, but they are not proof of real model writing quality.
+Pure deterministic tests and API tests are not proof of real model writing quality.
 
-Ollama configuration remains available at `http://localhost:11434/api/chat` with default model `qwen3.5:0.8b` for development/extension. The production medical reply path is deterministic so that safety and latency do not depend on model availability.
+The repository now has two different AI checks:
+- `test-ai-response-layer.js` checks communication-brief and validator contracts.
+- `test-ai-mock-integration.js` starts a fake Ollama endpoint and exercises the actual application AI request path, including prompt construction, validation, and safe fallback.
+- `test-ollama-live.js` checks behavior with a real Ollama instance and the configured model when one is available.
 
-For live model validation, run `node test-ollama-live.js` on a machine where Ollama is running and the configured model is installed. A `SKIPPED` result means live model behavior was not tested in that environment.
+A live Ollama PASS is the only repository test evidence for actual Qwen behavior. `SKIPPED` means the real model was not available and must not be described as proven.
 
-Do not claim "Ollama behavior proven" from deterministic fallback-only tests.
+Default local configuration:
+- Ollama endpoint: `http://localhost:11434/api/chat`
+- model: `qwen3.5:0.8b`
+- context: `2048`
+- temperature: `0.35`
+- communication timeout: `2200 ms`
+
+Environment variables:
+- `AI_ENABLED=false` disables the communication layer.
+- `OLLAMA_URL` selects the Ollama `/api/chat` endpoint.
+- `OLLAMA_MODEL` selects the model.
+- `OLLAMA_NUM_CTX` controls model context size.
+- `OLLAMA_TEMPERATURE` controls wording variation; it does not create memory.
+- `AI_TIMEOUT_MS` controls the communication-layer timeout.
+
+Vercel cannot reach a developer machine's localhost Ollama. A reachable remote Ollama endpoint must be configured for deployed AI responses. Without it, the deterministic fallback remains active.
+
+The admin RAG store uses the local filesystem. Vercel function storage is not durable, so document uploads are intentionally rejected on Vercel unless persistent storage is added later. Built-in RAG references still work on Vercel.
 
 ## 19. Latest repaired behavior
 The current baseline specifically enforces progressive medical assistance. A recognized medical statement may receive safe general guidance immediately even when situation-specific details are still missing. The response should then ask one useful question, and the next user turn must update the same active situation before standalone intent handling.
@@ -363,15 +400,15 @@ Kit integration is contextual: when a mapped kit item is relevant, the response 
 
 Generic wound wording is now a deliberate clarification gate. Inputs such as `sugat` or `sugat, dugo` do not receive wound-care instructions or a kit recommendation until the system establishes the bleeding status. A clearly described `small cut`, active `bleeding`, or similarly specific statement can still receive the appropriate baseline guidance while asking the next high-value question.
 
-## 20. Next development objective
-The final integration goal is to keep **progressive assistance + persistent situation state + deterministic safety-controlled communication** stable across representative medical situations without reintroducing old routing conflicts. Ollama can be re-enabled as a communication enhancement later without moving decision authority out of the structured pipeline.
+## 20. Current integration state
+The AI communication architecture is now connected end-to-end. RAG retrieval feeds the communication brief, Qwen is used for routine medical communication when available, generated replies are validated against the approved safety envelope, and deterministic formatting remains the fail-safe fallback. The next stage is behavioral testing with the real Ollama/Qwen setup, followed by tuning the model/context/timeout if needed.
 
 ## 21. Core principle
 > **The structured pipeline decides what assistance is justified. The knowledge and kit layers provide what is grounded. Context keeps the situation coherent. The response layer communicates it clearly. Ollama, when used, never overrides the structured decision. The assistant never invents what the system does not know.**
 
 ## Latest behavior fixes (September 2026)
 
-The current release keeps the deterministic medical pipeline authoritative and prevents the conversational model from overriding established medical routing or formatting.
+The current release keeps the deterministic medical pipeline authoritative while giving the conversational model responsibility for natural communication. The model does not make safety decisions or bypass structured routing.
 
 - Medical replies are English-only.
 - A medical concern receives useful supported care immediately when possible; clarification is never a question-only dead end.
@@ -388,8 +425,7 @@ The current release keeps the deterministic medical pipeline authoritative and p
 
 Voice playback uses the browser's built-in `speechSynthesis` API; no additional speech service is required. Voice input remains separate from automatic voice playback. Chrome/Edge are recommended for the broadest browser speech support.
 
-## Persistent conversation memory (Stage 7)
-## Context reconnection (Stage 7.1)
+## Persistent conversation memory and context reconnection (Stages 7–7.1)
 
 Persistent memory is not used as a replacement for RAG. RAG remains the knowledge-retrieval layer, while session memory stores the active conversation state. Stage 7.1 adds an explicit context-reconnection pass for ambiguous follow-ups and corrections. When an active medical situation exists, messages such as "actually it is on my index finger" or "what should I do with it?" can reconnect to that situation instead of falling into the generic capability response. Established facts are updated rather than duplicated, and unrelated/casual turns do not erase the active situation. The memory snapshot is also protected from accidental replacement by a blank context.
 
@@ -399,11 +435,11 @@ The assistant now keeps a compact session-memory snapshot separate from RAG. RAG
 
 Casual/uncategorized turns no longer erase the active situation. This prevents short conversational messages such as “no bro” from destroying an established medical context. A new medical topic can replace the active topic while the previous situation is retained as a suspended snapshot.
 
-The memory layer contains structured state, not hidden chain-of-thought or diagnoses. It is intended to become the compact context supplied to Ollama/cloud AI later, so the AI does not need the entire transcript to preserve continuity.
+The memory layer contains structured state, not hidden chain-of-thought or diagnoses. The current communication brief uses this state so Ollama can preserve continuity without receiving the entire transcript.
 
 ## Medical coverage hardening — FINAL10
 
-FINAL10 keeps the deterministic safety layer authoritative and expands the curated medical guidance coverage before any optional AI/Ollama communication layer is used.
+The current release keeps the deterministic safety layer authoritative and uses the curated medical guidance as the approved safety envelope for the AI communication layer.
 
 ### Injury and emergency coverage
 The deterministic guidance layer now has explicit entries for:
@@ -444,3 +480,64 @@ Safety-critical CPR and musculoskeletal guidance was cross-checked against curre
 
 ### Ollama live testing
 The repository includes `test-ollama-live.js`. The test runs automatically when an Ollama server is reachable at the configured local endpoint and the configured model is available. In environments where Ollama is not installed/running, the test is intentionally reported as SKIPPED rather than failing the deterministic suite.
+
+## AI Communication Layer (2.0)
+
+MedisinACSHS 2.0 now separates **medical decision-making** from **AI communication**.
+
+### Responsibility split
+
+The deterministic medical pipeline remains authoritative for:
+
+- emergency detection and urgency
+- severity and red-flag handling
+- first-aid actions that are allowed to be given
+- MedisinACSHS kit contents and kit-use facts
+- hospital/facility lookup and location handling
+- medication/prescription boundaries
+- conversation facts and pending safety-critical details
+
+The AI communication layer (Qwen through Ollama) is responsible for:
+
+- answering the user's latest question rather than restarting the whole protocol
+- using established conversation facts and recent turns
+- recognizing that the user has already received previous guidance
+- acknowledging corrections/updates and continuing from the current state
+- choosing natural wording and concise structure
+- asking at most one genuinely necessary follow-up question
+- keeping medical replies in English
+
+The model is **not** allowed to diagnose, prescribe, invent kit items, invent hospitals, add unsupported medical treatment, or override the deterministic decision.
+
+### How the AI receives context
+
+The server builds a bounded communication brief containing the latest user message, active topic, urgency/severity, known facts, pending information, approved medical actions/summary, relevant kit items, previous guidance, and recent conversation turns. This is communication context, not chain-of-thought.
+
+This means a sequence such as:
+
+1. `I cut my palm while opening a can.`
+2. `It is bleeding a little, but I can control it.`
+3. `What in the kit can I use for that?`
+4. `Okay. How do I use it?`
+5. `What should I do now?`
+
+is treated as one evolving situation. The AI is explicitly instructed not to repeat earlier guidance when the latest question can be answered directly.
+
+### Ollama configuration
+
+The default local model is `qwen3.5:0.8b` through `http://localhost:11434/api/chat`.
+
+Environment variables:
+
+- `AI_ENABLED=false` disables the AI communication layer.
+- `OLLAMA_URL` selects the Ollama `/api/chat` endpoint. A reachable remote endpoint may be used for an online deployment.
+- `OLLAMA_MODEL` selects the model.
+- `OLLAMA_NUM_CTX` controls the model context size (default `2048`).
+- `OLLAMA_TEMPERATURE` controls communication variation (default `0.35`). This does **not** create memory; memory comes from the structured session state.
+- `AI_TIMEOUT_MS` limits how long the server waits for the communication layer (default `2200` ms).
+
+If Ollama is unavailable, the server falls back to the deterministic response formatter. Safety therefore does not depend on the model being online.
+
+### Testing
+
+`npm run test:all` includes the AI communication-layer contract test. The live Ollama test remains intentionally skippable when Ollama/model availability is absent. A live model test should only be considered a PASS when an actual configured Ollama instance responds.
