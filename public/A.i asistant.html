@@ -119,6 +119,11 @@ const synthesisSupported = 'speechSynthesis' in window;
 const isSecureVoiceContext = window.isSecureContext || location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
 
 const conversationHistory = [];
+let sessionMemory = null;
+try {
+    const savedMemory = sessionStorage.getItem('medisinacshs.sessionMemory');
+    if (savedMemory) sessionMemory = JSON.parse(savedMemory);
+} catch {}
 let recognition;
 let isListening = false;
 let isAwaitingResponse = false;
@@ -578,6 +583,8 @@ function addWelcomeMessage() {
 
 function resetConversation() {
     conversationHistory.length = 0;
+    sessionMemory = null;
+    try { sessionStorage.removeItem('medisinacshs.sessionMemory'); } catch {}
     lastAssessment = null;
     stopListening();
     stopSpeaking();
@@ -597,7 +604,8 @@ async function sendToAssistantLive(userText) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
             system_instruction: { parts: [{ text: SYSTEM_CONTEXT }] },
-            contents: conversationHistory
+            contents: conversationHistory,
+            session_memory: sessionMemory
         })
     });
 
@@ -616,6 +624,10 @@ async function sendToAssistantLive(userText) {
 
     const replyText = data.reply || 'Sorry, I could not generate a response. Please try again.';
     lastAssessment = data.assessment || null;
+    if (data.sessionMemory) {
+        sessionMemory = data.sessionMemory;
+        try { sessionStorage.setItem('medisinacshs.sessionMemory', JSON.stringify(sessionMemory)); } catch {}
+    }
     conversationHistory.push({ role: 'model', parts: [{ text: replyText }] });
     // Remember whether this reply looked like emergency guidance, so a
     // hospital lookup right after it still leads with an emergency reminder

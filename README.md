@@ -387,3 +387,10 @@ The current release keeps the deterministic medical pipeline authoritative and p
 ### Voice support
 
 Voice playback uses the browser's built-in `speechSynthesis` API; no additional speech service is required. Voice input remains separate from automatic voice playback. Chrome/Edge are recommended for the broadest browser speech support.
+
+## Persistent conversation memory (Stage 7)
+The assistant now keeps a compact session-memory snapshot separate from RAG. RAG remains for knowledge retrieval; conversation memory stores the active situation, established facts, pending information, a short recent-turn window, and suspended situation snapshots. The browser sends this compact state with each request and stores it in `sessionStorage`, while the server validates and updates it.
+
+Casual/uncategorized turns no longer erase the active situation. This prevents short conversational messages such as “no bro” from destroying an established medical context. A new medical topic can replace the active topic while the previous situation is retained as a suspended snapshot.
+
+The memory layer contains structured state, not hidden chain-of-thought or diagnoses. It is intended to become the compact context supplied to Ollama/cloud AI later, so the AI does not need the entire transcript to preserve continuity.
