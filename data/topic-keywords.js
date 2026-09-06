@@ -37,7 +37,7 @@ const TOPIC_KEYWORDS = {
     "seizure", "having a seizure", "convulsion", "nagse-seizure", "may seizure", "kombulsyon",
   ],
   fainting: [
-    "fainted", "fainting", "passed out", "lost consciousness",
+    "fainted", "fainting", "passed out", "collapsed", "suddenly collapsed", "lost consciousness",
     "nahimatay", "nawalan ng malay",
   ],
   eye_issue: [

@@ -5,7 +5,7 @@
     "node": "24.x"
   },
   "scripts": {
-    "test:all": "node test-medical-coverage.js && node test-kit-item-guidance.js && node test-ai-response-layer.js && node test-ai-mock-integration.js && node test-pipeline-contracts.js && node test-progressive-state.js && node test-session-memory.js && node test-context-reconnection.js && node test-conversation-continuity.js && node test-situation-state.js && node test-v7-structured-medical.js && node test-current-contracts.js && node test-final-regressions.js && node test-api-smoke.js && node test-api-behavior.js && node test-ollama-live.js",
+    "test:all": "node test-medical-coverage.js && node test-kit-item-guidance.js && node test-ai-response-layer.js && node test-ai-mock-integration.js && node test-contextual-kit.js && node test-pipeline-contracts.js && node test-progressive-state.js && node test-session-memory.js && node test-context-reconnection.js && node test-conversation-continuity.js && node test-situation-state.js && node test-v7-structured-medical.js && node test-current-contracts.js && node test-final-regressions.js && node test-api-smoke.js && node test-api-behavior.js && node test-ollama-live.js",
     "start": "node scripts/kiosk-server.cjs"
   },
   "dependencies": {

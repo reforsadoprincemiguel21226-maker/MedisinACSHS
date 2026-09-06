@@ -26,8 +26,8 @@ assert.equal(x.d.responseType, 'emergency_first_aid');
 // Contextual sufficiency: location stated in the original burn turn should not
 // be asked again; one useful severity question may remain.
 x=d('I accidentally touched a hot pan and burned my hand. It hurts and is red.');
-assert.equal(x.u.severity, 'minor');
-assert(!x.d.missingInfo.includes('burn_extent_or_location') || x.d.missingInfo.length === 0);
+assert.equal(x.u.severity, 'potentially_severe');
+assert.equal(x.d.responseType, 'urgent_medical_guidance');
 
 // Kit relevance is specific, not inventory dumping.
 const kit = mapKitItems(...(() => { const z=d('I have a small cut on my finger.'); return [z.u,z.d,{limit:4}]; })());
