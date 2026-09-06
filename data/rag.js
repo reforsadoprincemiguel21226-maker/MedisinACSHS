@@ -6,7 +6,7 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
-// Lives under the static-served data/ dir, but server.js's static-file MIME
+// Lives under the static-served data/ dir, but kiosk-server.js's static-file MIME
 // allowlist (.html/.js/.css/.png/.webmanifest only) has no .txt/.json entry,
 // so these files 404 through the static route — not directly fetchable.
 // Don't add .txt or .json to that allowlist without moving this store first.

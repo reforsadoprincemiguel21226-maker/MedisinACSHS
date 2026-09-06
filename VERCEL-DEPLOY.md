@@ -7,7 +7,7 @@ This package is Vercel-ready for a normal GitHub import.
 Put these files directly in the GitHub repository root. Do not add an extra wrapper folder.
 
 - `index.html`
-- `server.js`
+- `kiosk-server.js`
 - `api/chat.js`
 - `api/admin/docs.js`
 - `package.json`
@@ -30,12 +30,12 @@ No custom start command is required on Vercel. Vercel serves the root static fil
 
 ## Why this package has `api/`
 
-The original application has a local Node HTTP server (`server.js`). Vercel's standard Node.js Function deployment expects an exported handler under `/api`, so the Vercel adapter exposes the existing chat/admin handlers through:
+The original application has a local Node HTTP server (`kiosk-server.js`). Vercel's standard Node.js Function deployment expects an exported handler under `/api`, so the Vercel adapter exposes the existing chat/admin handlers through:
 
 - `/api/chat`
 - `/api/admin/docs`
 
-`server.js` remains the local/kiosk server and still starts normally with `npm start`.
+`kiosk-server.js` remains the local/kiosk server and still starts normally with `npm start`.
 
 ## Important limitation
 
