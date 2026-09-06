@@ -389,6 +389,12 @@ The current release keeps the deterministic medical pipeline authoritative and p
 Voice playback uses the browser's built-in `speechSynthesis` API; no additional speech service is required. Voice input remains separate from automatic voice playback. Chrome/Edge are recommended for the broadest browser speech support.
 
 ## Persistent conversation memory (Stage 7)
+## Context reconnection (Stage 7.1)
+
+Persistent memory is not used as a replacement for RAG. RAG remains the knowledge-retrieval layer, while session memory stores the active conversation state. Stage 7.1 adds an explicit context-reconnection pass for ambiguous follow-ups and corrections. When an active medical situation exists, messages such as "actually it is on my index finger" or "what should I do with it?" can reconnect to that situation instead of falling into the generic capability response. Established facts are updated rather than duplicated, and unrelated/casual turns do not erase the active situation. The memory snapshot is also protected from accidental replacement by a blank context.
+
+The system deliberately does not store diagnoses or chain-of-thought. It stores bounded structured facts, pending information, recent turns, and suspended situations.
+
 The assistant now keeps a compact session-memory snapshot separate from RAG. RAG remains for knowledge retrieval; conversation memory stores the active situation, established facts, pending information, a short recent-turn window, and suspended situation snapshots. The browser sends this compact state with each request and stores it in `sessionStorage`, while the server validates and updates it.
 
 Casual/uncategorized turns no longer erase the active situation. This prevents short conversational messages such as “no bro” from destroying an established medical context. A new medical topic can replace the active topic while the previous situation is retained as a suspended snapshot.

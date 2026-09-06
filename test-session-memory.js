@@ -18,3 +18,13 @@ const memory2 = buildMemory(memory1, ctx, 'no bro', 'Okay — I am still with yo
 assert.strictEqual(memory2.conversationSummary.activeTopic, 'minor_wound');
 assert.strictEqual(memory2.recentTurns.length, 2);
 console.log('session memory: PASS');
+
+
+// Reconnection regression: an existing wound must survive conversational
+// filler and reconnect when the user supplies a correction or pronoun-based
+// follow-up. The server-level test exercises the full HTTP path; these state
+// assertions protect the underlying memory contract.
+const previous = buildMemory(memory2, ctx, 'no bro', 'Okay — I am still with you on the cut.', d);
+assert.strictEqual(previous.conversationSummary.activeTopic, 'minor_wound');
+assert.strictEqual(previous.activeContext?.activeSituation?.topics?.[0], 'minor_wound');
+console.log('memory retention through casual turn: PASS');
