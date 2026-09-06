@@ -1,0 +1,371 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background: linear-gradient(160deg, #fff3f4 0%, #f7ecf0 45%, #f2e8f6 100%);
+    color: #1f1f2e;
+    font-family: "Segoe UI", "Trebuchet MS", sans-serif;
+}
+
+.site-logo-link {
+    position: fixed;
+    top: 14px;
+    left: 14px;
+    z-index: 1200;
+    display: inline-flex;
+    border-radius: 50%;
+}
+
+.site-logo-link:focus-visible {
+    outline: 3px solid #00103a;
+    outline-offset: 3px;
+}
+
+.site-logo {
+    width: clamp(54px, 6vw, 76px);
+    height: auto;
+    display: block;
+    filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.2));
+}
+
+.page-shell {
+    width: min(980px, 94vw);
+    margin: 92px auto 40px;
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 16px 32px rgba(72, 33, 52, 0.12);
+    padding: 28px;
+}
+
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.back-link {
+    color: #b4142f;
+    text-decoration: none;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+}
+
+.back-link:hover,
+.back-link:focus-visible {
+    text-decoration: underline;
+}
+
+h1 {
+    margin: 8px 0 6px;
+    font-size: clamp(1.8rem, 3.4vw, 2.6rem);
+    color: #ab0f2a;
+}
+
+.lead {
+    margin: 0 0 24px;
+    color: #4c4f68;
+    font-size: 1.02rem;
+}
+
+.grid {
+    display: grid;
+    gap: 14px;
+}
+
+.card {
+    display: block;
+    text-decoration: none;
+    background: #fff7f8;
+    border: 1px solid #ffd4da;
+    border-radius: 14px;
+    padding: 16px;
+    color: inherit;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.card:hover,
+.card:focus-visible {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 18px rgba(182, 38, 65, 0.14);
+}
+
+.card h2,
+.card h3 {
+    margin: 0 0 8px;
+    color: #8e0d24;
+}
+
+.badge {
+    display: inline-block;
+    margin-bottom: 8px;
+    background: #ffe8eb;
+    color: #9e1430;
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.meta {
+    margin: 0;
+    color: #4f4f68;
+    line-height: 1.5;
+}
+
+.form-grid {
+    display: grid;
+    gap: 14px;
+}
+
+label {
+    font-weight: 700;
+    color: #6b1024;
+}
+
+input,
+textarea,
+select {
+    width: 100%;
+    margin-top: 6px;
+    padding: 10px 12px;
+    border: 1px solid #f0b8c2;
+    border-radius: 10px;
+    font: inherit;
+}
+
+textarea {
+    min-height: 110px;
+    resize: vertical;
+}
+
+button {
+    width: fit-content;
+    border: none;
+    border-radius: 999px;
+    padding: 10px 18px;
+    background: #e81f49;
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.schedule-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.schedule-time {
+    color: #6f7893;
+    font-weight: 700;
+}
+
+.medalendar-card {
+    margin-top: 12px;
+    border: 1px solid #f5c7d1;
+    background: linear-gradient(170deg, #fff9fb 0%, #f7edf2 100%);
+    padding: clamp(18px, 3vw, 28px);
+}
+
+.medalendar-title {
+    margin: 0;
+    color: #39404f;
+    letter-spacing: 0.4px;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    line-height: 1.05;
+}
+
+.medalendar-subtitle {
+    margin: 8px 0 22px;
+    color: #464f63;
+    font-size: clamp(1rem, 1.8vw, 1.2rem);
+}
+
+.medalendar-form {
+    display: grid;
+    gap: 14px;
+}
+
+.medalendar-form label {
+    margin: 2px 0 -4px;
+    font-size: 0.98rem;
+    color: #353d4b;
+    font-weight: 800;
+    letter-spacing: 0.2px;
+}
+
+.medalendar-form input,
+.medalendar-form select {
+    margin-top: 0;
+    min-height: 52px;
+    border-radius: 10px;
+    border: 1px solid #b9c4d8;
+    background: #f7fbff;
+    color: #2b2f44;
+    font-size: 1.02rem;
+    padding: 12px 14px;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.medalendar-form input:focus,
+.medalendar-form select:focus {
+    border-color: #7bb4ef;
+    box-shadow: 0 0 0 3px rgba(123, 180, 239, 0.25);
+    outline: none;
+}
+
+.medalendar-time-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.medalendar-submit {
+    width: 100%;
+    margin-top: 4px;
+    min-height: 52px;
+    border-radius: 9px;
+    background: linear-gradient(90deg, #e24677 0%, #d93f70 100%);
+    font-size: 1.02rem;
+    letter-spacing: 0.4px;
+    box-shadow: 0 10px 18px rgba(180, 34, 79, 0.2);
+}
+
+.medalendar-submit:hover,
+.medalendar-submit:focus-visible {
+    filter: brightness(1.05);
+}
+
+.directory-card {
+    padding: 0;
+}
+
+.directory-row {
+    display: grid;
+    grid-template-columns: minmax(220px, 1fr) minmax(280px, 1fr);
+    gap: 18px;
+    padding: 18px 16px;
+    border-bottom: 1px solid #f0ccd2;
+    align-items: center;
+}
+
+.directory-row:last-child {
+    border-bottom: none;
+}
+
+.directory-name,
+.directory-number {
+    margin: 0;
+    font-size: clamp(0.98rem, 1.6vw, 1.45rem);
+    line-height: 1.35;
+}
+
+.directory-name {
+    font-weight: 700;
+    color: #2b2f44;
+}
+
+.directory-number {
+    font-weight: 600;
+    color: #3e445f;
+}
+
+.private-list-card {
+    padding: 18px 18px 8px;
+}
+
+.group-title {
+    margin: 0 0 8px;
+    font-size: clamp(1.1rem, 2vw, 1.6rem);
+    color: #2b2f44;
+}
+
+.group-title:not(:first-child) {
+    margin-top: 24px;
+}
+
+.hospital-list {
+    margin: 0;
+    padding-left: 24px;
+}
+
+.hospital-list li {
+    margin: 0 0 12px;
+    color: #3e445f;
+    line-height: 1.5;
+    font-size: clamp(1rem, 1.5vw, 1.35rem);
+}
+
+.police-directory-card {
+    margin-bottom: 16px;
+}
+
+.police-directory-row {
+    display: grid;
+    grid-template-columns: minmax(180px, 1fr) minmax(200px, 0.9fr) minmax(220px, 1fr);
+    gap: 14px;
+    padding: 16px;
+    border-bottom: 1px solid #f0ccd2;
+    align-items: center;
+}
+
+.police-directory-row:last-child {
+    border-bottom: none;
+}
+
+.emergency-directory-card {
+    margin-bottom: 16px;
+}
+
+.emergency-directory-row {
+    display: grid;
+    grid-template-columns: minmax(180px, 1fr) minmax(200px, 0.9fr) minmax(220px, 1fr);
+    gap: 14px;
+    padding: 16px;
+    border-bottom: 1px solid #f0ccd2;
+    align-items: center;
+}
+
+.emergency-directory-row:last-child {
+    border-bottom: none;
+}
+
+@media (max-width: 680px) {
+    .page-shell {
+        margin: 76px auto 18px;
+        padding: 20px;
+    }
+
+    .directory-row {
+        grid-template-columns: 1fr;
+        gap: 6px;
+        padding: 14px 14px;
+    }
+
+    .private-list-card {
+        padding: 14px 14px 4px;
+    }
+
+    .police-directory-row {
+        grid-template-columns: 1fr;
+        gap: 6px;
+        padding: 14px;
+    }
+
+    .emergency-directory-row {
+        grid-template-columns: 1fr;
+        gap: 6px;
+        padding: 14px;
+    }
+
+    .medalendar-time-grid {
+        grid-template-columns: 1fr;
+    }
+}

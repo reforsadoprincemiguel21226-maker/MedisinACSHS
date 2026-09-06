@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Plan and Schedule</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#ffffff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="assets/images/icon-white-192.png">
+<link rel="stylesheet" href="css/feature-pages.css">
+</head>
+<body>
+<a class="site-logo-link" href="home.html" aria-label="Go to home page">
+    <img src="assets/images/logoACSHS.png" alt="ACSHS logo" class="site-logo">
+</a>
+<main class="page-shell">
+    <div class="top-bar">
+        <a class="back-link" href="home.html">&larr; Back to Home</a>
+        <span class="badge">Plan &amp; Schedule</span>
+    </div>
+
+    <section class="card medalendar-card" aria-label="Appointment scheduler">
+        <h1 class="medalendar-title">MEDALENDAR.</h1>
+        <p class="medalendar-subtitle">Schedule your medical intake here.</p>
+
+        <form class="medalendar-form" action="#" method="post">
+            <label for="full-name">PATIENT'S FULL NAME</label>
+            <input id="full-name" name="full-name" type="text" placeholder="Juan dela Cruz" required>
+
+            <label for="drug-name">NAME OF DRUGS</label>
+            <select id="drug-name" name="drug-name" required>
+                <option value="" disabled selected>Pumili ng gamot...</option>
+                <option value="paracetamol">Paracetamol</option>
+                <option value="ibuprofen">Ibuprofen</option>
+                <option value="amoxicillin">Amoxicillin</option>
+                <option value="cetirizine">Cetirizine</option>
+                <option value="metformin">Metformin</option>
+            </select>
+
+            <div class="medalendar-time-grid">
+                <div>
+                    <label for="start-time">START TIME</label>
+                    <input id="start-time" name="start-time" type="datetime-local" required>
+                </div>
+                <div>
+                    <label for="end-time">END TIME</label>
+                    <input id="end-time" name="end-time" type="datetime-local" required>
+                </div>
+            </div>
+
+            <button type="submit" class="medalendar-submit">BOOK APPOINTMENT</button>
+        </form>
+
+        <div class="calendar-tools" aria-label="Calendar import and export">
+            <label for="ics-import">IMPORT AN ICS FILE</label>
+            <input id="ics-import" type="file" accept=".ics,text/calendar">
+            <p id="ics-status" role="status"></p>
+        </div>
+    </section>
+</main>
+
+<script src="assets/js/pwa-register.js"></script>
+<script>
+const medalendarForm = document.querySelector('.medalendar-form');
+
+function toICSDate(dateValue) {
+    const date = new Date(dateValue);
+    return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+}
+
+function sanitizeICSField(value) {
+    return String(value || '')
+        .replace(/\\/g, '\\\\')
+        .replace(/;/g, '\\;')
+        .replace(/,/g, '\\,')
+        .replace(/\n/g, '\\n');
+}
+
+function downloadCalendarFile(icsContent, filename) {
+    const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+    const link = document.createElement('a');
+
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    setTimeout(() => {
+        URL.revokeObjectURL(link.href);
+    }, 0);
+}
+
+async function shareCalendarFile(icsContent, filename) {
+    if (typeof File === 'undefined' || !navigator.share || !navigator.canShare) {
+        return false;
+    }
+
+    const file = new File([icsContent], filename, { type: 'text/calendar' });
+
+    if (!navigator.canShare({ files: [file] })) {
+        return false;
+    }
+
+    try {
+        await navigator.share({
+            title: 'Medical Appointment',
+            text: 'Add this appointment to your calendar.',
+            files: [file]
+        });
+        return true;
+    } catch (error) {
+        return error?.name === 'AbortError';
+    }
+}
+
+function toGoogleCalendarDate(dateValue) {
+    return new Date(dateValue).toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+}
+
+function buildGoogleCalendarUrl({ title, details, start, end }) {
+    const baseUrl = 'https://calendar.google.com/calendar/render?action=TEMPLATE';
+    const text = encodeURIComponent(title);
+    const description = encodeURIComponent(details);
+    const dates = `${toGoogleCalendarDate(start)}/${toGoogleCalendarDate(end)}`;
+    return `${baseUrl}&text=${text}&details=${description}&dates=${dates}`;
+}
+
+function unescapeICSField(value) {
+    return String(value || '')
+        .replace(/\\n/gi, '\n')
+        .replace(/\\([\\;,])/g, '$1');
+}
+
+function parseICSDate(value) {
+    const match = String(value || '').match(/^(\d{4})(\d{2})(\d{2})T?(\d{2})?(\d{2})?(\d{2})?/);
+    if (!match) return '';
+    const [, year, month, day, hours = '00', minutes = '00'] = match;
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+}
+
+function importICS(text) {
+    const unfolded = text.replace(/\r?\n[ \t]/g, '').split(/\r?\n/);
+    const event = {};
+    unfolded.forEach((line) => {
+        const separator = line.indexOf(':');
+        if (separator < 0) return;
+        const key = line.slice(0, separator).split(';')[0].toUpperCase();
+        if (['SUMMARY', 'DESCRIPTION', 'DTSTART', 'DTEND'].includes(key)) {
+            event[key] = unescapeICSField(line.slice(separator + 1));
+        }
+    });
+
+    const summary = event.SUMMARY || '';
+    const patientName = summary.replace(/^Medical Appointment\s*-\s*/i, '').trim();
+    const medication = (event.DESCRIPTION || '').replace(/^Medication\s*:\s*/i, '').trim().toLowerCase();
+    if (patientName) document.getElementById('full-name').value = patientName;
+    if ([...document.getElementById('drug-name').options].some((option) => option.value === medication)) {
+        document.getElementById('drug-name').value = medication;
+    }
+    document.getElementById('start-time').value = parseICSDate(event.DTSTART);
+    document.getElementById('end-time').value = parseICSDate(event.DTEND);
+    return Boolean(event.SUMMARY && event.DTSTART && event.DTEND);
+}
+
+document.getElementById('ics-import').addEventListener('change', async (event) => {
+    const file = event.target.files[0];
+    const status = document.getElementById('ics-status');
+    if (!file) return;
+    try {
+        const imported = importICS(await file.text());
+        status.textContent = imported ? 'Calendar event imported. Review the details, then book or export it.' : 'This ICS file does not contain a supported appointment.';
+    } catch {
+        status.textContent = 'Could not read this ICS file.';
+    }
+});
+
+medalendarForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const patientName = document.getElementById('full-name').value.trim();
+    const drugName = document.getElementById('drug-name').value;
+    const startTime = document.getElementById('start-time').value;
+    const endTime = document.getElementById('end-time').value;
+
+    if (!patientName || !drugName || !startTime || !endTime) {
+        return;
+    }
+
+    if (new Date(endTime) <= new Date(startTime)) {
+        alert('End time must be later than start time.');
+        return;
+    }
+
+    const uid = `${Date.now()}@medisinacshs`;
+    const nowStamp = toICSDate(new Date().toISOString());
+    const summary = sanitizeICSField(`Medical Appointment - ${patientName}`);
+    const description = sanitizeICSField(`Medication: ${drugName}`);
+    const googleCalendarUrl = buildGoogleCalendarUrl({
+        title: `Medical Appointment - ${patientName}`,
+        details: `Medication: ${drugName}`,
+        start: startTime,
+        end: endTime
+    });
+
+    const icsData = [
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//MedisinACSHS//Appointment Scheduler//EN',
+        'BEGIN:VEVENT',
+        `UID:${uid}`,
+        `DTSTAMP:${nowStamp}`,
+        `DTSTART:${toICSDate(startTime)}`,
+        `DTEND:${toICSDate(endTime)}`,
+        `SUMMARY:${summary}`,
+        `DESCRIPTION:${description}`,
+        'END:VEVENT',
+        'END:VCALENDAR'
+    ].join('\r\n');
+
+    alert('Your appointment has been booked.');
+    window.open(googleCalendarUrl, '_blank', 'noopener');
+    const shared = await shareCalendarFile(icsData, 'medisinacshs-appointment.ics');
+
+    if (!shared) {
+        downloadCalendarFile(icsData, 'medisinacshs-appointment.ics');
+    }
+
+    medalendarForm.reset();
+});
+</script>
+</body>
+</html>
