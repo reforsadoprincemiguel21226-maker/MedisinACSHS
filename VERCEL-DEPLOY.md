@@ -1,56 +1,58 @@
 # MedisinACSHS 2.0 — Vercel deployment
 
-This package is Vercel-ready for a normal GitHub import.
+This version is structured as a static frontend plus Vercel Node Functions. It does not use a root Node server entrypoint.
 
 ## Repository structure
 
-Put these files directly in the GitHub repository root. Do not add an extra wrapper folder.
+```text
+index.html and other site pages -> public/
+public/
+  index.html
+  home.html
+  A.i asistant.html
+  admin.html
+  emergency-hotlines.html
+  plan-schedule.html
+  manifest.webmanifest
+  sw.js
+  css/
+  assets/
+  hotlines/
+api/
+  chat.js
+  admin/docs.js
+lib/
+  server-core.js and medical pipeline modules
+data/
+  kit, medical guidance, hospitals, RAG data
+scripts/
+  kiosk-server.cjs (local-only server)
+vercel.json
+package.json
+```
 
-- `index.html`
-- `kiosk-server.js`
-- `api/chat.js`
-- `api/admin/docs.js`
-- `package.json`
-- `data/`
-- `lib/`
-- `assets/`
-- `css/`
+## Vercel configuration
 
-## Vercel settings
+`vercel.json` explicitly selects **Other** (`framework: null`), uses no build command, serves `public/` as the static output directory, and deploys the two files under `api/` as Node Functions.
 
-Use the repository root as **Root Directory**.
+No root `server.js`, `kiosk-server.js`, `app.js`, or other Node server entrypoint is present. This avoids Vercel's standalone Node-server detection.
 
-- Framework Preset: **Other**
-- Build Command: leave empty / automatic
-- Output Directory: leave empty
-- Install Command: automatic
-- Node.js: **24.x**
-
-No custom start command is required on Vercel. Vercel serves the root static files and deploys the files in `api/` as Node.js Functions.
-
-## Why this package has `api/`
-
-The original application has a local Node HTTP server (`kiosk-server.js`). Vercel's standard Node.js Function deployment expects an exported handler under `/api`, so the Vercel adapter exposes the existing chat/admin handlers through:
-
-- `/api/chat`
-- `/api/admin/docs`
-
-`kiosk-server.js` remains the local/kiosk server and still starts normally with `npm start`.
-
-## Important limitation
-
-The normal medical response path is deterministic and does not require Ollama on Vercel. Ollama settings remain for local/development extension.
-
-The admin document store uses the application's local filesystem. Vercel Functions do not provide durable local storage, so uploaded admin documents should not be treated as persistent on the Vercel deployment. For the kiosk/local deployment, the existing local document store remains available.
+Node 24 is pinned in `package.json`.
 
 ## Deploy
 
 1. Extract this ZIP.
-2. Put its **contents** directly in the GitHub repository root.
-3. Commit and push.
-4. Vercel should automatically create a new deployment.
-5. Open the production URL and test `/` and then the assistant.
+2. Replace the GitHub repository contents with the ZIP contents.
+3. Commit and push to `main`.
+4. Use the existing **medisinacshs** Vercel project. Do not create a second project.
+5. Vercel should build the new commit. If automatic Git deployment does not trigger, manually deploy the `main` branch from the existing project's Deployments page.
 
+## Production behavior
 
-## FINAL5 Vercel architecture note
-The Vercel deployment uses only /api Node Functions and static root files. The backend implementation lives in lib/server-core.js; no root Node server entrypoint or package start script is used, preventing Vercel from misclassifying the backend as a standalone server.
+The routine medical response path is deterministic and does not require Ollama. Ollama remains a local/development extension.
+
+The admin RAG document store uses local filesystem storage; Vercel function storage is not durable, so admin uploads should not be considered persistent on Vercel.
+
+## Local development
+
+`npm start` runs `scripts/kiosk-server.cjs`, which serves the same `public/` frontend and the same `/api` handlers locally.

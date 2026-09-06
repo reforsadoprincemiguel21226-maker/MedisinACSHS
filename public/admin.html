@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>MedisinACSHS Admin — RAG Documents</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="css/ai-assistant.css">
+<style>
+    body { max-width: 720px; margin: 0 auto; padding: 24px 16px; font-family: system-ui, sans-serif; }
+    .doc-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #ddd; }
+    .doc-meta { color: #666; font-size: 0.85em; }
+    button { cursor: pointer; }
+    #status { min-height: 1.2em; font-size: 0.9em; }
+    #status.error { color: #b00020; }
+    #status.ok { color: #1a7d1a; }
+</style>
+</head>
+<body>
+<h1>MedisinACSHS — RAG Documents</h1>
+<p>Upload .txt, .md, or .pdf health-info files. The chat assistant retrieves matching text from these when answering.</p>
+
+<div id="auth-gate">
+    <label>Admin token: <input type="password" id="token-input"></label>
+    <button id="token-save">Unlock</button>
+</div>
+
+<div id="admin-panel" hidden>
+    <form id="upload-form">
+        <input type="file" id="file-input" accept=".txt,.md,.pdf" required>
+        <button type="submit">Upload</button>
+    </form>
+    <p id="status"></p>
+    <h2>Documents</h2>
+    <div id="doc-list">Loading…</div>
+</div>
+
+<script>
+const authGate = document.getElementById('auth-gate');
+const adminPanel = document.getElementById('admin-panel');
+const tokenInput = document.getElementById('token-input');
+const statusEl = document.getElementById('status');
+const docList = document.getElementById('doc-list');
+
+function getToken() { return sessionStorage.getItem('adminToken') || ''; }
+
+function setStatus(text, kind) {
+    statusEl.textContent = text;
+    statusEl.className = kind || '';
+}
+
+async function api(path, options = {}) {
+    const res = await fetch(path, {
+        ...options,
+        headers: { ...(options.headers || {}), Authorization: `Bearer ${getToken()}` }
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || `Request failed (${res.status})`);
+    return data;
+}
+
+async function refreshDocs() {
+    docList.textContent = 'Loading…';
+    try {
+        const { docs } = await api('/api/admin/docs');
+        if (!docs.length) { docList.textContent = 'No documents uploaded yet.'; return; }
+        docList.innerHTML = '';
+        docs.forEach((doc) => {
+            const row = document.createElement('div');
+            row.className = 'doc-row';
+
+            const info = document.createElement('div');
+            info.appendChild(document.createTextNode(doc.originalName));
+            const meta = document.createElement('div');
+            meta.className = 'doc-meta';
+            meta.textContent = `${doc.chars} chars · uploaded ${new Date(doc.uploadedAt).toLocaleString()}`;
+            info.appendChild(meta);
+
+            const delBtn = document.createElement('button');
+            delBtn.textContent = 'Delete';
+            delBtn.addEventListener('click', () => deleteDoc(doc.id));
+
+            row.append(info, delBtn);
+            docList.appendChild(row);
+        });
+    } catch (err) {
+        docList.textContent = '';
+        setStatus(err.message, 'error');
+    }
+}
+
+async function deleteDoc(id) {
+    try {
+        await api(`/api/admin/docs?id=${encodeURIComponent(id)}`, { method: 'DELETE' });
+        setStatus('Deleted.', 'ok');
+        refreshDocs();
+    } catch (err) {
+        setStatus(err.message, 'error');
+    }
+}
+
+function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result.split(',')[1]);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+}
+
+function unlock() {
+    const token = tokenInput.value.trim();
+    if (!token) return;
+    sessionStorage.setItem('adminToken', token);
+    authGate.hidden = true;
+    adminPanel.hidden = false;
+    refreshDocs();
+}
+
+document.getElementById('token-save').addEventListener('click', unlock);
+tokenInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') unlock(); });
+
+document.getElementById('upload-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const file = document.getElementById('file-input').files[0];
+    if (!file) return;
+    setStatus('Uploading…');
+    try {
+        const contentBase64 = await fileToBase64(file);
+        await api('/api/admin/docs', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ filename: file.name, contentBase64 })
+        });
+        setStatus(`Uploaded "${file.name}".`, 'ok');
+        e.target.reset();
+        refreshDocs();
+    } catch (err) {
+        setStatus(err.message, 'error');
+    }
+});
+
+if (getToken()) { authGate.hidden = true; adminPanel.hidden = false; refreshDocs(); }
+</script>
+</body>
+</html>

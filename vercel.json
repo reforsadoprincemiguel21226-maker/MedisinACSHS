@@ -1,3 +1,14 @@
 {
-  "$schema": "https://openapi.vercel.sh/vercel.json"
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "buildCommand": null,
+  "outputDirectory": "public",
+  "functions": {
+    "api/chat.js": {
+      "maxDuration": 10
+    },
+    "api/admin/docs.js": {
+      "maxDuration": 10
+    }
+  }
 }

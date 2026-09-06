@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>MedisinACSHS AI Asistant</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/ai-assistant.css">
+<meta name="theme-color" content="#ffffff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="assets/images/icon-white-192.png">
+</head>
+<body>
+<a class="site-logo-link" href="home.html" aria-label="Go to home page">
+    <img src="assets/images/logoACSHS.png" alt="ACSHS logo" class="site-logo">
+</a>
+<main class="assistant-page" aria-label="MedisinACSHS AI assistant page">
+    <div class="assistant-window">
+        <header class="assistant-header">
+            <div class="assistant-branding">
+                <a class="home-link" href="home.html" aria-label="Back to home">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="m15 18-6-6 6-6"></path>
+                    </svg>
+                </a>
+                <span class="assistant-avatar" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="9"></circle>
+                        <path d="M8.8 13.3a3.4 3.4 0 0 0 6.4 0"></path>
+                        <circle cx="9.2" cy="10.2" r="1"></circle>
+                        <circle cx="14.8" cy="10.2" r="1"></circle>
+                    </svg>
+                </span>
+                <div>
+                    <h1>MedisinACSHS Assistant</h1>
+                    <p class="status"><span class="status-dot"></span>Online - Ready to assist</p>
+                </div>
+            </div>
+
+            <div class="assistant-actions" aria-label="Conversation controls">
+                <button class="header-btn" id="toggle-voice-playback" type="button" title="Voice replies are off" aria-label="Turn voice replies on" aria-pressed="false">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M11 5 6 9H3v6h3l5 4z"></path>
+                        <path d="M15.5 8.5a5 5 0 0 1 0 7"></path>
+                        <path d="M18.5 5.5a9 9 0 0 1 0 13"></path>
+                    </svg>
+                </button>
+                <button class="header-btn" id="refresh-chat" type="button" title="Refresh conversation" aria-label="Refresh conversation">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M21 12a9 9 0 1 1-2.64-6.36"></path>
+                        <path d="M21 4v6h-6"></path>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <section class="chat-shell" aria-label="Assistant messages">
+            <article class="message message-assistant">
+                <div class="message-head">
+                    <span class="heart-icon" aria-hidden="true">&#9825;</span>
+                    <strong>MedisinACSHS</strong>
+                </div>
+                <p>
+                    Hi, I'm MedisinACSHS and I'm here to help with medical, technical, or emotional support.
+                </p>
+                <p>What can I do for you?</p>
+                <time datetime="21:22">09:22 PM</time>
+            </article>
+        </section>
+
+        <form class="chat-input" aria-label="Send a message">
+            <label class="sr-only" for="assistant-message">Type your message</label>
+            <input id="assistant-message" type="text" placeholder="Type your message here...">
+            <div class="input-actions">
+                <button class="voice-btn" id="voice-input-btn" type="button" aria-label="Speak to the assistant" title="Speak to the assistant">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M12 15a3 3 0 0 0 3-3V7a3 3 0 1 0-6 0v5a3 3 0 0 0 3 3z"></path>
+                        <path d="M19 11a7 7 0 0 1-14 0"></path>
+                        <path d="M12 18v3"></path>
+                        <path d="M8 21h8"></path>
+                    </svg>
+                    <span>Speak</span>
+                </button>
+                <button class="send-btn" type="submit">Send</button>
+            </div>
+        </form>
+
+        <p class="voice-status" id="voice-status" aria-live="polite"></p>
+
+        <p class="footer-note">Powered by MedisinACSHS AI - For informational purposes only</p>
+    </div>
+</main>
+
+<script>
+const CHAT_API_URL = '/api/chat';
+
+const SYSTEM_CONTEXT =
+    `You are MedisinACSHS, a helpful AI assistant connected to the physical first-aid kit kiosk.
+The introduction is already shown in the chat; do not repeat it.
+Casual conversation may be Filipino or Taglish. Medical/first-aid guidance must be English.
+The server is the sole authority for medical decisions, kit facts, and hospital lookup.`;
+
+const chatForm   = document.querySelector('.chat-input');
+const chatInput  = document.getElementById('assistant-message');
+const chatShell  = document.querySelector('.chat-shell');
+const sendBtn    = document.querySelector('.send-btn');
+const refreshBtn = document.getElementById('refresh-chat');
+const voiceInputBtn = document.getElementById('voice-input-btn');
+const voicePlaybackBtn = document.getElementById('toggle-voice-playback');
+const voiceStatus = document.getElementById('voice-status');
+
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+const recognitionSupported = typeof SpeechRecognition === 'function';
+const synthesisSupported = 'speechSynthesis' in window;
+const isSecureVoiceContext = window.isSecureContext || location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+
+const conversationHistory = [];
+let recognition;
+let isListening = false;
+let isAwaitingResponse = false;
+let autoSpeakReplies = false;
+let availableVoices = [];
+let recognitionStartTimer;
+let lastAssessment = null;
+
+function getTime() {
+    return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
+function setVoiceStatus(message, tone = '') {
+    if (!voiceStatus) {
+        return;
+    }
+
+    voiceStatus.textContent = message;
+    voiceStatus.className = tone ? `voice-status ${tone}` : 'voice-status';
+}
+
+function stripReplyForSpeech(text) {
+    return text
+        .replace(/```[\s\S]*?```/g, ' ')
+        .replace(/[`*_#>-]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+function loadVoices() {
+    if (!synthesisSupported) {
+        return;
+    }
+
+    availableVoices = window.speechSynthesis.getVoices();
+}
+
+function getPreferredVoice() {
+    if (!availableVoices.length) {
+        loadVoices();
+    }
+
+    return (
+        availableVoices.find((voice) => voice.lang?.toLowerCase().startsWith('en')) ||
+        availableVoices[0] ||
+        null
+    );
+}
+
+function stopSpeaking() {
+    if (synthesisSupported) {
+        window.speechSynthesis.cancel();
+    }
+}
+
+function speakReply(text) {
+    if (!autoSpeakReplies || !synthesisSupported) {
+        return;
+    }
+
+    const spokenText = stripReplyForSpeech(text);
+    if (!spokenText) {
+        return;
+    }
+
+    stopSpeaking();
+
+    const utterance = new SpeechSynthesisUtterance(spokenText);
+    const preferredVoice = getPreferredVoice();
+
+    if (preferredVoice) {
+        utterance.voice = preferredVoice;
+        utterance.lang = preferredVoice.lang;
+    }
+
+    utterance.rate = 0.9;
+    utterance.pitch = 1.2;
+    window.speechSynthesis.speak(utterance);
+}
+
+function updateVoicePlaybackButton() {
+    if (!voicePlaybackBtn) {
+        return;
+    }
+
+    voicePlaybackBtn.disabled = !synthesisSupported;
+    if (!synthesisSupported) {
+        voicePlaybackBtn.title = 'Voice replies are not supported in this browser';
+        voicePlaybackBtn.setAttribute('aria-label', 'Voice replies are not supported in this browser');
+        voicePlaybackBtn.setAttribute('aria-pressed', 'false');
+        voicePlaybackBtn.classList.add('is-muted');
+        return;
+    }
+
+    voicePlaybackBtn.title = autoSpeakReplies ? 'Turn voice replies off' : 'Turn voice replies on';
+    voicePlaybackBtn.setAttribute('aria-label', autoSpeakReplies ? 'Turn voice replies off' : 'Turn voice replies on');
+    voicePlaybackBtn.setAttribute('aria-pressed', String(autoSpeakReplies));
+    voicePlaybackBtn.classList.toggle('is-muted', !autoSpeakReplies);
+}
+
+function updateVoiceInputButton() {
+    if (!voiceInputBtn) {
+        return;
+    }
+
+    if (!recognitionSupported) {
+        voiceInputBtn.disabled = true;
+        voiceInputBtn.title = 'Voice input works best in Chrome or Edge';
+        voiceInputBtn.setAttribute('aria-label', 'Voice input is not supported in this browser');
+        voiceInputBtn.classList.remove('is-listening');
+        voiceInputBtn.querySelector('span').textContent = 'No Mic';
+        setVoiceStatus('Voice input is unavailable here. Use Chrome or Edge for microphone support.', 'is-error');
+        return;
+    }
+
+    if (!isSecureVoiceContext) {
+        voiceInputBtn.disabled = true;
+        voiceInputBtn.title = 'Open this page through HTTPS or localhost to use the microphone';
+        voiceInputBtn.setAttribute('aria-label', 'Open this page through HTTPS or localhost to use the microphone');
+        voiceInputBtn.classList.remove('is-listening');
+        voiceInputBtn.querySelector('span').textContent = 'No Mic';
+        setVoiceStatus('Microphone input needs HTTPS or localhost. If you opened the HTML file directly, run it from localhost or your deployed site.', 'is-error');
+        return;
+    }
+
+    voiceInputBtn.disabled = isAwaitingResponse;
+    voiceInputBtn.classList.toggle('is-listening', isListening);
+    voiceInputBtn.querySelector('span').textContent = isListening ? 'Listening' : 'Speak';
+    const label = isAwaitingResponse
+        ? 'Please wait for the current reply to finish'
+        : (isListening ? 'Stop listening' : 'Speak to the assistant');
+    voiceInputBtn.title = label;
+    voiceInputBtn.setAttribute('aria-label', label);
+
+    if (isAwaitingResponse) {
+        setVoiceStatus('Waiting for the assistant reply before starting the microphone.');
+    } else if (isListening) {
+        setVoiceStatus('Listening now. Speak clearly, then pause.');
+    } else {
+        setVoiceStatus('Tap Speak to talk to the assistant.');
+    }
+}
+
+function stopListening() {
+    if (recognition && isListening) {
+        recognition.stop();
+    }
+}
+
+async function ensureMicrophonePermission() {
+    const mediaDevices = navigator.mediaDevices;
+
+    if (!mediaDevices || typeof mediaDevices.getUserMedia !== 'function') {
+        return true;
+    }
+
+    try {
+        const stream = await mediaDevices.getUserMedia({ audio: true });
+        stream.getTracks().forEach((track) => track.stop());
+        return true;
+    } catch (error) {
+        setVoiceStatus('Microphone permission is blocked. Allow microphone access in your browser settings.', 'is-error');
+        addAssistantMessage('I cannot access your microphone yet. Please allow microphone permission, then tap Speak again.');
+        return false;
+    }
+}
+
+function scheduleRecognitionStartGuard() {
+    clearTimeout(recognitionStartTimer);
+    recognitionStartTimer = setTimeout(() => {
+        if (isListening) {
+            return;
+        }
+
+        setVoiceStatus('Microphone did not start. Try Chrome or Edge, then allow mic permission and try again.', 'is-error');
+    }, 2200);
+}
+
+async function startListening() {
+    if (!recognitionSupported || !recognition) {
+        return;
+    }
+
+    if (isAwaitingResponse) {
+        setVoiceStatus('Please wait for the assistant reply before speaking.');
+        return;
+    }
+
+    const hasMicPermission = await ensureMicrophonePermission();
+    if (!hasMicPermission) {
+        return;
+    }
+
+    stopSpeaking();
+    setVoiceStatus('Starting microphone...');
+    scheduleRecognitionStartGuard();
+
+    try {
+        recognition.start();
+    } catch (error) {
+        clearTimeout(recognitionStartTimer);
+        const message = error?.message || '';
+
+        if (/already started/i.test(message)) {
+            setVoiceStatus('Microphone is already listening. Speak now.');
+            return;
+        }
+
+        setVoiceStatus('Could not start the microphone. Try Chrome or Edge and allow microphone permission.', 'is-error');
+        console.error(error);
+    }
+}
+
+function toggleListening() {
+    if (isListening) {
+        stopListening();
+        return;
+    }
+
+    void startListening();
+}
+
+function shutdownVoiceFeatures() {
+    clearTimeout(recognitionStartTimer);
+    stopListening();
+    stopSpeaking();
+}
+
+function initSpeechRecognition() {
+    if (!recognitionSupported || !isSecureVoiceContext) {
+        updateVoiceInputButton();
+        return;
+    }
+
+    recognition = new SpeechRecognition();
+    recognition.lang = 'en-US';
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    recognition.addEventListener('start', () => {
+        clearTimeout(recognitionStartTimer);
+        isListening = true;
+        updateVoiceInputButton();
+    });
+
+    recognition.addEventListener('end', () => {
+        clearTimeout(recognitionStartTimer);
+        isListening = false;
+        updateVoiceInputButton();
+    });
+
+    recognition.addEventListener('result', (event) => {
+        const transcript = Array.from(event.results)
+            .map((result) => result[0]?.transcript || '')
+            .join(' ')
+            .trim();
+
+        if (!transcript) {
+            return;
+        }
+
+        chatInput.value = transcript;
+        setVoiceStatus(`Heard: ${transcript}`);
+        handleSend(transcript);
+    });
+
+    recognition.addEventListener('error', (event) => {
+        if (event.error === 'aborted') {
+            setVoiceStatus('Microphone stopped. Tap Speak to try again.');
+            return;
+        }
+
+        if (event.error === 'not-allowed') {
+            setVoiceStatus('Microphone access was blocked. Allow microphone permission and try again.', 'is-error');
+            addAssistantMessage('Microphone access was blocked. Please allow microphone permission and try again.');
+            return;
+        }
+
+        if (event.error === 'no-speech') {
+            setVoiceStatus('No speech detected. Try again and speak closer to the microphone.', 'is-error');
+            addAssistantMessage('I did not hear anything. Tap Speak and try again.');
+            return;
+        }
+
+        if (event.error === 'network' || event.error === 'service-not-allowed') {
+            setVoiceStatus('Voice input failed to start. This usually means the browser or page context does not allow speech recognition.', 'is-error');
+            addAssistantMessage('Voice input is blocked in this browser or page. Try Chrome or Edge on localhost or HTTPS.');
+            return;
+        }
+
+        setVoiceStatus('Voice input is unavailable right now. Please type your message instead.', 'is-error');
+        addAssistantMessage('Voice input is unavailable right now. Please type your message instead.');
+    });
+
+    updateVoiceInputButton();
+}
+
+function addUserMessage(text) {
+    const article = document.createElement('article');
+    article.className = 'message message-user';
+    article.innerHTML = `<p></p><time>${getTime()}</time>`;
+    article.querySelector('p').textContent = text;
+    chatShell.appendChild(article);
+    chatShell.scrollTop = chatShell.scrollHeight;
+}
+
+function escapeHtml(text) {
+    return String(text).replace(/[&<>"']/g, (character) => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[character]));
+}
+
+function renderInlineMarkdown(text) {
+    let html = escapeHtml(text);
+    html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+    html = html.replace(/\*\*([^*]+)\*\*|__([^_]+)__/g, (_, boldA, boldB) => `<strong>${boldA || boldB}</strong>`);
+    html = html.replace(/\*([^*]+)\*|_([^_]+)_/g, (_, italicA, italicB) => `<em>${italicA || italicB}</em>`);
+    html = html.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+    return html;
+}
+
+function addAssistantMessage(text, assessment = null) {
+    const article = document.createElement('article');
+    article.className = 'message message-assistant';
+    article.innerHTML = `
+        <div class="message-head">
+            <span class="heart-icon" aria-hidden="true">&#9825;</span>
+            <strong>MedisinACSHS</strong>
+        </div>
+        <time>${getTime()}</time>`;
+    const timeEl = article.querySelector('time');
+
+    const lines = String(text)
+        .replace(/<br\s*\/?\s*>/gi, '\n')
+        .split(/\n+/)
+        .map((line) => line.trim())
+        .filter(Boolean);
+
+    (lines.length ? lines : [String(text)]).forEach((line) => {
+        const heading = line.match(/^#{1,3}\s+(.+)$/);
+        const unordered = line.match(/^[-*]\s+(.+)$/);
+        const ordered = line.match(/^\d+[.)]\s+(.+)$/);
+        const element = document.createElement(heading ? 'h3' : (unordered || ordered) ? 'p' : 'p');
+        element.innerHTML = renderInlineMarkdown((heading || unordered || ordered || [null, line])[1]);
+        if (unordered || ordered) element.className = 'message-list-item';
+        article.insertBefore(element, timeEl);
+    });
+
+    if (shouldShowAssessment(assessment)) {
+        article.appendChild(buildAssessmentPanel(assessment));
+    }
+
+    chatShell.appendChild(article);
+    chatShell.scrollTop = chatShell.scrollHeight;
+    speakReply(text);
+}
+
+function shouldShowAssessment(assessment) {
+    if (!assessment || typeof assessment !== 'object') return false;
+    return assessment.active === true ||
+        assessment.messageType === 'hospital' ||
+        assessment.messageType === 'location';
+}
+
+function assessmentList(items, emptyText) {
+    const values = Array.isArray(items) ? items.filter(Boolean) : [];
+    if (!values.length) return `<span class="assessment-empty">${escapeHtml(emptyText)}</span>`;
+    return `<ul>${values.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>`;
+}
+
+function buildAssessmentPanel(assessment) {
+    const details = document.createElement('details');
+    details.className = 'assessment-panel';
+
+    const summary = document.createElement('summary');
+    summary.innerHTML = '<span class="assessment-chevron" aria-hidden="true">›</span><span>MedisinACSHS assessment</span>';
+    details.appendChild(summary);
+
+    const body = document.createElement('div');
+    body.className = 'assessment-body';
+
+    const rows = [];
+    if (assessment.topic) rows.push(['Situation', assessment.topic]);
+    if (assessment.severityLabel) rows.push(['Risk level', assessment.severityLabel]);
+    if (assessment.bodyLocation) rows.push(['Location', assessment.bodyLocation]);
+    if (assessment.relevantKit) rows.push(['Kit relevance', assessment.relevantKit]);
+
+    rows.forEach(([label, value]) => {
+        const row = document.createElement('div');
+        row.className = 'assessment-row';
+        row.innerHTML = `<span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong>`;
+        body.appendChild(row);
+    });
+
+    if (assessment.knownFacts?.length) {
+        const section = document.createElement('div');
+        section.className = 'assessment-section';
+        section.innerHTML = '<strong>What I know</strong>' + assessmentList(assessment.knownFacts, 'No specific details recorded yet.');
+        body.appendChild(section);
+    }
+
+    if (assessment.unknownFacts?.length) {
+        const section = document.createElement('div');
+        section.className = 'assessment-section';
+        section.innerHTML = '<strong>What is still unclear</strong>' + assessmentList(assessment.unknownFacts, 'Nothing important is missing.');
+        body.appendChild(section);
+    }
+
+    if (assessment.emergencyFlags?.length) {
+        const section = document.createElement('div');
+        section.className = 'assessment-section assessment-alert';
+        section.innerHTML = '<strong>Safety flag</strong>' + assessmentList(assessment.emergencyFlags, 'No emergency flag recorded.');
+        body.appendChild(section);
+    }
+
+    if (assessment.nextBestQuestion) {
+        const section = document.createElement('div');
+        section.className = 'assessment-section';
+        section.innerHTML = `<strong>Next useful detail</strong><p>${escapeHtml(assessment.nextBestQuestion)}</p>`;
+        body.appendChild(section);
+    }
+
+    const note = document.createElement('p');
+    note.className = 'assessment-note';
+    note.textContent = 'This is a summary of the information and safety decisions used for the reply.';
+    body.appendChild(note);
+
+    details.appendChild(body);
+    return details;
+}
+
+function showTyping() {
+    const article = document.createElement('article');
+    article.className = 'message message-assistant';
+    article.id = 'typing-indicator';
+    article.innerHTML = `
+        <div class="message-head">
+            <span class="heart-icon" aria-hidden="true">&#9825;</span>
+            <strong>MedisinACSHS</strong>
+        </div>
+        <div class="typing-dots"><span></span><span></span><span></span></div>
+        <time>${getTime()}</time>`;
+    chatShell.appendChild(article);
+    chatShell.scrollTop = chatShell.scrollHeight;
+    // Typing indicator must never trigger speech.
+}
+
+function hideTyping() {
+    const typing = document.getElementById('typing-indicator');
+    if (typing) typing.remove();
+}
+
+function addWelcomeMessage() {
+    addAssistantMessage("Hi, I'm MedisinACSHS and I'm here to help with medical, technical, or emotional support. What can I do for you?");
+}
+
+function resetConversation() {
+    conversationHistory.length = 0;
+    lastAssessment = null;
+    stopListening();
+    stopSpeaking();
+    hideTyping();
+    chatShell.innerHTML = '';
+    addWelcomeMessage();
+    chatInput.disabled = false;
+    sendBtn.disabled = false;
+    chatInput.focus();
+}
+
+async function sendToAssistantLive(userText) {
+    conversationHistory.push({ role: 'user', parts: [{ text: userText }] });
+
+    const response = await fetch(CHAT_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            system_instruction: { parts: [{ text: SYSTEM_CONTEXT }] },
+            contents: conversationHistory
+        })
+    });
+
+    const responseText = await response.text();
+    let data;
+    try {
+        data = responseText ? JSON.parse(responseText) : {};
+    } catch {
+        throw new Error(`The server returned an invalid response (${response.status}). Please restart the server and try again.`);
+    }
+
+    if (!response.ok) {
+        const detail = data?.error || data?.detail || `Server error ${response.status}`;
+        throw new Error(typeof detail === 'string' ? detail : JSON.stringify(detail));
+    }
+
+    const replyText = data.reply || 'Sorry, I could not generate a response. Please try again.';
+    lastAssessment = data.assessment || null;
+    conversationHistory.push({ role: 'model', parts: [{ text: replyText }] });
+    // Remember whether this reply looked like emergency guidance, so a
+    // hospital lookup right after it still leads with an emergency reminder
+    // instead of only showing the hospital list (Task 2, Section D).
+    lastReplyWasEmergency = /\bcall\s*(the\s*)?911\b|emergency (department|services|care)|urgent first aid|medical emergency/i.test(replyText);
+    return { reply: replyText, assessment: lastAssessment };
+}
+
+async function sendToAssistant(userText) {
+    return sendToAssistantLive(userText);
+}
+
+async function handleSend(text) {
+    const msg = text.trim();
+    if (!msg) return;
+
+    isAwaitingResponse = true;
+    chatInput.value = '';
+    chatInput.disabled = true;
+    sendBtn.disabled = true;
+    updateVoiceInputButton();
+
+    addUserMessage(msg);
+    showTyping();
+
+    try {
+        const result = await sendToAssistant(msg);
+        hideTyping();
+        addAssistantMessage(result.reply, result.assessment);
+    } catch (err) {
+        hideTyping();
+        addAssistantMessage(`Sorry, something went wrong: ${err.message}`);
+        console.error(err);
+    } finally {
+        isAwaitingResponse = false;
+        chatInput.disabled = false;
+        sendBtn.disabled = false;
+        updateVoiceInputButton();
+        chatInput.focus();
+    }
+}
+
+chatForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    handleSend(chatInput.value);
+});
+
+refreshBtn.addEventListener('click', resetConversation);
+
+voiceInputBtn.addEventListener('click', toggleListening);
+
+document.querySelectorAll('a[href="home.html"]').forEach((link) => {
+    link.addEventListener('click', shutdownVoiceFeatures);
+});
+
+voicePlaybackBtn.addEventListener('click', () => {
+    autoSpeakReplies = !autoSpeakReplies;
+    if (!autoSpeakReplies) {
+        stopSpeaking();
+    }
+    updateVoicePlaybackButton();
+});
+
+if (synthesisSupported) {
+    loadVoices();
+    window.speechSynthesis.onvoiceschanged = loadVoices;
+}
+
+initSpeechRecognition();
+updateVoicePlaybackButton();
+
+window.addEventListener('beforeunload', shutdownVoiceFeatures);
+window.addEventListener('pagehide', shutdownVoiceFeatures);
+</script>
+<script src="assets/js/pwa-register.js"></script>
+</body>
+</html>

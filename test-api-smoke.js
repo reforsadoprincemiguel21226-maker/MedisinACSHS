@@ -14,7 +14,7 @@ async function post(port, contents) {
 (async()=>{
   const port=3137;
   const {spawn}=require('child_process');
-  const child=spawn(process.execPath,['kiosk-server.js'],{env:{...process.env,PORT:String(port),OLLAMA_URL:'http://127.0.0.1:9/api/chat',ADMIN_TOKEN:''},stdio:['ignore','pipe','pipe']});
+  const child=spawn(process.execPath,['scripts/kiosk-server.cjs'],{env:{...process.env,PORT:String(port),OLLAMA_URL:'http://127.0.0.1:9/api/chat',ADMIN_TOKEN:''},stdio:['ignore','pipe','pipe']});
   await new Promise((resolve,reject)=>{let done=false; const timer=setTimeout(()=>{if(!done){done=true;resolve();}},500); child.stdout.on('data',d=>{if(/running at/.test(d.toString())&&!done){done=true;clearTimeout(timer);resolve();}}); child.on('exit',c=>{if(!done){done=true;reject(new Error('server exited '+c));}})});
 
   let r=await post(port,[{role:'user',parts:[{text:'I feel dizzy.'}]}]);

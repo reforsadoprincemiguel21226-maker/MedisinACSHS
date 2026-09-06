@@ -5,9 +5,11 @@
     "node": "24.x"
   },
   "scripts": {
-    "test:all": "node test-pipeline-contracts.js && node test-progressive-state.js && node test-situation-state.js && node test-v7-structured-medical.js && node test-current-contracts.js && node test-final-regressions.js && node test-api-smoke.js && node test-api-behavior.js && node test-ollama-live.js"
+    "test:all": "node test-pipeline-contracts.js && node test-progressive-state.js && node test-situation-state.js && node test-v7-structured-medical.js && node test-current-contracts.js && node test-final-regressions.js && node test-api-smoke.js && node test-api-behavior.js && node test-ollama-live.js",
+    "start": "node scripts/kiosk-server.cjs"
   },
   "dependencies": {
     "pdf-parse": "^2.4.5"
-  }
+  },
+  "type": "commonjs"
 }

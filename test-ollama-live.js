@@ -36,7 +36,7 @@ function post(contents) {
     process.exit(0);
   }
 
-  const child = spawn(process.execPath, ['kiosk-server.js'], {
+  const child = spawn(process.execPath, ['scripts/kiosk-server.cjs'], {
     env: { ...process.env, PORT: String(PORT), OLLAMA_URL, OLLAMA_MODEL, ADMIN_TOKEN: '' },
     stdio: ['ignore', 'pipe', 'pipe']
   });
