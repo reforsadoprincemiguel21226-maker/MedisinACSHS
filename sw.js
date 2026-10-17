@@ -1,12 +1,18 @@
-const CACHE_NAME = 'medisinacshs-shell-v3';
+const CACHE_NAME = 'medisinacshs-shell-v7-home-inventory-center4';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
   '/home.html',
   '/css/style.css',
   '/css/home.css',
+  '/assets/images/settings-icon.png',
+  '/assets/images/refresh-icon.png',
+  '/assets/images/location-icon.png',
+  '/assets/images/assistant-icon.png',
+  '/assets/images/inventory-icon.png',
   '/css/ai-assistant.css',
   '/assets/images/logoACSHS.png',
+  '/assets/images/aria-nurse-white.png',
   '/assets/images/icon-white-192.png',
   '/assets/images/icon-white-512.png',
   '/A.i%20asistant.html',
