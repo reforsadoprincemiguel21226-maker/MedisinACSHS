@@ -1,4 +1,4 @@
-const CACHE_NAME = 'medisinacshs-shell-v7-home-inventory-center4';
+const CACHE_NAME = 'medisinacshs-shell-v7-home-sizing4';
 const STATIC_ASSETS = [
   '/',
   '/index.html',

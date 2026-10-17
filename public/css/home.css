@@ -98,8 +98,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 /* Match the visible artwork, not just the source-file dimensions (the PNGs have different padding/aspect ratios). */
 .feature-icon--location { width: 80%; height: 80%; }
 .feature-icon--assistant { width: 88%; height: 88%; }
-.feature-icon--inventory { width: 52%; height: 65%; }
-.feature-icon--inventory img { transform: translateY(-8px); }
+.feature-icon--inventory { width: 52%; height: 65%; position: relative; top: -14px; }
 .settings-overlay { position: fixed; z-index: 5000; inset: 0; background: #fff; color: #124d52; }
 .settings-overlay[hidden] { display: none; }
 .settings-close { position: absolute; top: clamp(10px, 2vw, 24px); right: clamp(12px, 2vw, 28px); width: 48px; height: 48px; border: 0; border-radius: 50%; background: #e8f7f5; color: #176d73; font-size: 2.5rem; line-height: 1; display: grid; place-items: center; cursor: pointer; }
@@ -116,8 +115,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
   .feature-button { width: min(100%, 26vw); border-width: 1px; }
   .feature-icon--location { width: 80%; height: 80%; }
   .feature-icon--assistant { width: 88%; height: 88%; }
-  .feature-icon--inventory { width: 52%; height: 65%; }
-  .feature-icon--inventory img { transform: translateY(-8px); }
+  .feature-icon--inventory { width: 52%; height: 65%; position: relative; top: -14px; }
 }
 @media (max-width: 520px) {
   .home-header { height: 112px; min-height: 112px; }
