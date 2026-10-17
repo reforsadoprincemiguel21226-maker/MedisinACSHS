@@ -1,4 +1,4 @@
-const CACHE_NAME = 'medisinacshs-shell-v7-home-sizing4';
+const CACHE_NAME = 'medisinacshs-shell-v9-aria-chat';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -10,9 +10,12 @@ const STATIC_ASSETS = [
   '/assets/images/location-icon.png',
   '/assets/images/assistant-icon.png',
   '/assets/images/inventory-icon.png',
-  '/css/ai-assistant.css',
+  '/css/ai-assistant.css?v=aria-chat-2',
   '/assets/images/logoACSHS.png',
   '/assets/images/aria-nurse-white.png',
+  '/assets/images/aria-speaker-icon.png',
+  '/assets/images/aria-mic-icon.png',
+  '/assets/images/aria-send-icon.png',
   '/assets/images/icon-white-192.png',
   '/assets/images/icon-white-512.png',
   '/A.i%20asistant.html',
@@ -45,18 +48,27 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Static files: try the network first so updates show up immediately,
+  // keep a copy for offline use, and fall back to the cache only when offline.
   event.respondWith(
-    caches.match(event.request).then((cached) => {
-      if (cached) {
-        return cached;
-      }
-
-      return fetch(event.request).catch(() => {
-        if (event.request.mode === 'navigate') {
-          return caches.match('/home.html');
+    fetch(event.request)
+      .then((response) => {
+        if (response && response.ok && new URL(event.request.url).origin === self.location.origin) {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
         }
-        return new Response('', { status: 503, statusText: 'Offline' });
-      });
-    })
+        return response;
+      })
+      .catch(() =>
+        caches.match(event.request, { ignoreSearch: true }).then((cached) => {
+          if (cached) {
+            return cached;
+          }
+          if (event.request.mode === 'navigate') {
+            return caches.match('/home.html');
+          }
+          return new Response('', { status: 503, statusText: 'Offline' });
+        })
+      )
   );
 });
