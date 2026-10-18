@@ -1,4 +1,4 @@
-const CACHE_NAME = 'medisinacshs-shell-v9-aria-chat';
+const CACHE_NAME = 'medisinacshs-shell-v10-aria-decision-panel';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -10,7 +10,7 @@ const STATIC_ASSETS = [
   '/assets/images/location-icon.png',
   '/assets/images/assistant-icon.png',
   '/assets/images/inventory-icon.png',
-  '/css/ai-assistant.css?v=aria-chat-2',
+  '/css/ai-assistant.css?v=aria-chat-3',
   '/assets/images/logoACSHS.png',
   '/assets/images/aria-nurse-white.png',
   '/assets/images/aria-speaker-icon.png',

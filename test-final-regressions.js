@@ -39,5 +39,8 @@ const userFn = html.match(/function addUserMessage\(text\) \{[\s\S]*?\n\}/)?.[0]
 assert(!/speakReply\(text\)/.test(userFn));
 const typingFn = html.match(/function showTyping\(\) \{[\s\S]*?\n\}/)?.[0] || '';
 assert(!/speakReply/.test(typingFn));
-assert(html.includes('This is a summary of the information and safety decisions used for the reply.'));
+assert(html.includes('How ARIA decided'));
+assert(html.includes('This summary shows the known facts and safety factors behind this reply, not private internal reasoning.'));
+assert(!html.includes('footer-note'));
+assert(!html.includes('Powered by MedisinACSHS AI - For informational purposes only'));
 console.log('final regression checks: PASS');

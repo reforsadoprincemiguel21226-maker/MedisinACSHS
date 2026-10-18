@@ -477,16 +477,6 @@ h1 {
     cursor: not-allowed;
 }
 
-.footer-note {
-    flex: 0 0 auto;
-    margin: 0;
-    padding: 0.3rem 1rem 0.35rem;
-    text-align: center;
-    font-size: 0.72rem;
-    line-height: 1.1;
-    color: #c4e6e2;
-    background: #00323a;
-}
 
 /* Voice problems (blocked mic, unsupported browser) show as a small notice above the bar.
    Routine status text stays available to screen readers but is not drawn. */

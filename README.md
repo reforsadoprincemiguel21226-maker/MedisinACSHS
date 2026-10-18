@@ -292,7 +292,7 @@ Emotional-support messages should be empathetic and human. Do not mechanically r
 Technical/general questions should remain separate from medical routing.
 
 ## 15. Explainability panel
-The UI may show a collapsed **MedisinACSHS assessment** panel.
+The UI shows a collapsed **How ARIA decided** pull tab for relevant medical assessments and hospital/location lookups.
 
 It may expose a concise structured summary such as:
 - situation understood
@@ -419,7 +419,7 @@ The current release keeps the deterministic medical pipeline authoritative while
 - "What should I put in a first-aid kit for treating small cuts?" is treated as a targeted kit-content recommendation, not an inventory request.
 - Hospital lookup accepts an explicit municipality such as Antipolo directly and uses the supplied hospital dataset without distance calculation.
 - Voice replies are OFF by default. When browser speech synthesis is supported, the header control lets the user turn automatic assistant voice replies on/off. User messages and typing indicators are never spoken. Voice speaks the final rendered assistant reply and strips Markdown formatting for playback.
-- The assessment panel ends with the normal summary note and does not mention hidden model thoughts.
+- The **How ARIA decided** panel presents a concise structured summary (known facts, unknown details, risk/safety flags, kit relevance, and next useful detail) without exposing hidden chain-of-thought. The separate bottom footer note is removed from the chat UI.
 
 ### Voice support
 
