@@ -105,11 +105,43 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
   .delete-row { width: 24px; height: 24px; right: 2px; font-size: 19px; }
   .add-supplies { gap: 13px; }
 }
+
 @media (max-width: 440px) {
   .inventory-header h1 { font-size: 1.2rem; }
   .header-nurse { max-width: 30px; }
   .header-actions { gap: 1px; }
-  .icon-button { width: 34px; height: 34px; }
+
+  /* MOBILE — WARNING ICON SIZE */
+  .icon-button {
+    width: 20px;
+    height: 20px;
+  }
+
+  /* MOBILE — MOVE BOTH BADGES TOGETHER */
+  .warning-badges {
+    right: -6px;
+    bottom: -7px;
+  }
+
+  /* MOBILE — YELLOW EXPIRING BADGE */
+  .warning-badges .count-badge.expiring {
+    min-width: 17px;
+    height: 17px;
+    padding: 3px;
+    font-size: 10px;
+    transform: translate(0px, 0px);
+  }
+
+  /* MOBILE — RED EXPIRED BADGE */
+  .warning-badges .count-badge.expired {
+    min-width: 17px;
+    height: 17px;
+    padding: 3px;
+    font-size: 10px;
+    margin-left: -6px;
+    transform: translate(5px, -5px);
+  }
+
   .category-heading h2 { font-size: .9rem; }
   .table-header { font-size: .65rem; }
 }
