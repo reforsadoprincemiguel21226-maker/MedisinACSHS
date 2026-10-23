@@ -125,21 +125,21 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 
   /* MOBILE — YELLOW EXPIRING BADGE */
   .warning-badges .count-badge.expiring {
-    min-width: 17px;
-    height: 17px;
+    min-width: 10px;
+    height: 10px;
     padding: 3px;
     font-size: 10px;
-    transform: translate(0px, 0px);
+    transform: translate(5px, 0px);
   }
 
   /* MOBILE — RED EXPIRED BADGE */
   .warning-badges .count-badge.expired {
-    min-width: 17px;
-    height: 17px;
+    min-width: 10px;
+    height: 10px;
     padding: 3px;
     font-size: 10px;
     margin-left: -6px;
-    transform: translate(5px, -5px);
+    transform: translate(5px, 0px);
   }
 
   .category-heading h2 { font-size: .9rem; }
