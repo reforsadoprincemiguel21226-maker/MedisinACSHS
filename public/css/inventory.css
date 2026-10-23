@@ -113,8 +113,8 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 
   /* MOBILE — WARNING ICON SIZE */
   .icon-button {
-    width: 20px;
-    height: 20px;
+    width: 50px;
+    height: 50px;
   }
 
   /* MOBILE — MOVE BOTH BADGES TOGETHER */
