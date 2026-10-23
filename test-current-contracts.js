@@ -46,7 +46,7 @@ assert.strictEqual(c.facts.current_location, 'antipolo');
 assert(HOSPITALS_BY_LOCATION.antipolo.length > 0);
 assert(HOSPITALS_BY_LOCATION.angono.length > 0);
 
-const frontend = fs.readFileSync('A.i asistant.html', 'utf8');
+const frontend = fs.readFileSync('public/A.i asistant.html', 'utf8');
 for (const retired of ['buildDemoVenueReply', 'DISTANCE_REQUEST_WORDS', 'lastHospitalContext', 'tryHospitalReply', 'window.MEDISIN_HOSPITALS']) {
   assert(!frontend.includes(retired), `retired client hospital logic remains: ${retired}`);
 }

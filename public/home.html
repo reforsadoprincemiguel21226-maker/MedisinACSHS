@@ -9,7 +9,8 @@
 <title>ARIA — MedisinACSHS Home</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="assets/images/icon-white-192.png">
-<link rel="stylesheet" href="css/home.css?v=home-ui-v4">
+<link rel="stylesheet" href="css/home.css?v=home-ui-inventory-v4">
+<link rel="stylesheet" href="css/press-feedback.css?v=1">
 </head>
 <body>
 <header class="home-header">
@@ -40,8 +41,9 @@
   <a class="feature-button" href="A.i asistant.html" aria-label="Open ARIA AI assistant">
     <span class="feature-icon feature-icon--assistant"><img src="assets/images/assistant-icon.png" alt=""></span>
   </a>
-  <a class="feature-button" href="plan-schedule.html" aria-label="Plan and schedule">
+  <a class="feature-button" href="inventory.html" aria-label="Open ARIA inventory">
     <span class="feature-icon feature-icon--inventory"><img src="assets/images/inventory-icon.png" alt=""></span>
+    <span id="inventory-home-badge" class="inventory-home-badge" aria-label="Inventory expiry warnings" hidden></span>
   </a>
 </main>
 
@@ -49,6 +51,8 @@
   <button class="settings-close" id="settings-close" type="button" aria-label="Close settings" title="Close settings">×</button>
 </section>
 <script src="assets/js/pwa-register.js"></script>
-<script src="assets/js/home.js?v=home-ui-v3"></script>
+<script src="assets/js/inventory-store.js?v=inventory-ui-v4"></script>
+<script src="assets/js/home.js?v=home-ui-inventory-v4"></script>
+<script src="assets/js/press-feedback.js?v=1"></script>
 </body>
 </html>

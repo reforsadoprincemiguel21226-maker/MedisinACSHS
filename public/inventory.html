@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#126e76">
+  <title>ARIA Inventory</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="css/inventory.css?v=inventory-ui-v4">
+<link rel="stylesheet" href="css/press-feedback.css?v=1">
+</head>
+<body>
+  <div class="inventory-app">
+    <header class="inventory-header">
+      <a href="home.html" class="back-button" aria-label="Back to home" title="Back to home">
+        <svg viewBox="0 0 32 48" aria-hidden="true"><path d="M25 5 7 24l18 19"/></svg>
+      </a>
+      <img class="header-nurse" src="assets/images/aria-nurse-white.png" alt="">
+      <h1>ARIA INVENTORY</h1>
+      <div class="header-actions">
+        <div class="warning-wrap">
+          <button type="button" id="warning-button" class="icon-button warning-button" aria-label="View expiring and expired supplies" aria-expanded="false" aria-controls="warning-list" title="Expiry warnings">
+            <img src="assets/images/inventory-warning.png?v=5" alt="Warnings">
+            <span id="warning-badges" class="warning-badges" aria-hidden="true"></span>
+          </button>
+          <section class="warning-dropdown" id="warning-list" aria-label="Expiry warnings" hidden></section>
+        </div>
+        <button type="button" class="icon-button refresh-button" id="inventory-refresh" aria-label="Refresh inventory" title="Refresh">
+          <img src="assets/images/refresh-icon.png" alt="">
+        </button>
+      </div>
+    </header>
+    <main class="inventory-scroll" id="inventory-scroll">
+      <div class="inventory-content">
+        <div id="save-status" class="save-status" role="alert" hidden>Inventory changes could not be saved in this browser. Check its storage settings.</div>
+        <div id="categories" class="category-list" aria-live="polite"></div>
+        <button type="button" id="add-category" class="add-supplies">
+          <img src="assets/images/inventory-add.png" alt=""><span>Add Supplies</span>
+        </button>
+      </div>
+    </main>
+  </div>
+  <dialog id="delete-dialog" class="delete-dialog" aria-labelledby="delete-title">
+    <form method="dialog">
+      <h2 id="delete-title">Delete category?</h2>
+      <p id="delete-question"></p>
+      <div class="dialog-actions"><button type="button" id="cancel-delete">No</button><button type="button" id="confirm-delete" class="danger">Yes, delete</button></div>
+    </form>
+  </dialog>
+  <script src="assets/js/inventory-store.js?v=inventory-ui-v4"></script>
+  <script src="assets/js/inventory.js?v=inventory-ui-v4"></script>
+  <script src="assets/js/pwa-register.js"></script>
+<script src="assets/js/press-feedback.js?v=1"></script>
+</body>
+</html>

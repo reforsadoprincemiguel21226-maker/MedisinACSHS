@@ -541,3 +541,6 @@ If Ollama is unavailable, the server falls back to the deterministic response fo
 ### Testing
 
 `npm run test:all` includes the AI communication-layer contract test. The live Ollama test remains intentionally skippable when Ollama/model availability is absent. A live model test should only be considered a PASS when an actual configured Ollama instance responds.
+
+## UI inventory replacement (October 2026)
+The third home menu destination now opens `public/inventory.html`; the retired `plan-schedule.html` route redirects there. The UI starts with no categories and supports user-entered categories, supply rows, expiration warnings and home-screen badge. See `INVENTORY_UI_NOTES.md` for exact files, the 30-day expiration rule, persistence and integration limitations. This change intentionally retires the former Medalendar interface from the third menu by the owner's request; do not confuse the browser-local editable supply ledger with the approved catalog in `data/kit.js` until a shared data contract is implemented.

@@ -4,7 +4,7 @@ Read [README.md](README.md) for setup, retuning, RAG, calendar, and deployment i
 
 ## Commands
 
-- Install: `npm install`
+- Install dependencies: `npm ci`
 - Start Ollama: `ollama serve`
 - Download the default model: `ollama pull qwen3.5:0.8b`
 - Start the app: `ADMIN_TOKEN=dev-token npm start`
@@ -19,21 +19,21 @@ Read [README.md](README.md) for setup, retuning, RAG, calendar, and deployment i
 - `lib/server-core.js`: shared local/Vercel HTTP routing, safety pipeline, hospital/kit handling, and AI communication orchestration.
 - `lib/ai-response.js`: Qwen/Ollama communication brief, model call, and output validator.
 - `scripts/kiosk-server.cjs`: local CommonJS HTTP server wrapper.
-- `A.i asistant.html`: assistant UI, browser conversation state, Markdown rendering, and voice input controls.
+- `public/A.i asistant.html`: assistant UI, browser conversation state, Markdown rendering, and voice input controls.
 - `data/rag.js`: extraction, chunking, cached keyword retrieval, and document persistence.
 - `data/rag-defaults/`: tracked built-in health references.
 - `data/rag-store/`: private uploaded documents and manifest; never commit its contents.
 - `data/hospitals-data.js`: deterministic hospital directory.
 - `plan-schedule.html`: appointment form and ICS calendar workflows.
-- `assets/images/`: logos and icons.
-- `assets/js/`: browser scripts.
-- `css/`: stylesheets.
-- `sw.js` and `assets/js/pwa-register.js`: PWA caching and registration.
+- `public/assets/images/`: logos and icons.
+- `public/assets/js/`: browser scripts.
+- `public/css/`: stylesheets.
+- `public/sw.js` and `public/assets/js/pwa-register.js`: PWA caching and registration.
 
 ## Development Rules
 
-- Keep root HTML pages at the repository root because links and PWA paths are relative.
-- When adding or moving a static asset, update every page reference, `manifest.webmanifest`, and `sw.js`; bump the service-worker cache name when cached assets change.
+- `public/` is the single source of truth for all browser-served pages, CSS, JS, images, manifest, and service worker. Do not recreate root-level copies of these files.
+- When adding or moving a static asset, update every page reference, `public/manifest.webmanifest`, and `public/sw.js`; bump the service-worker cache name when cached assets change. Keep the service-worker precache list limited to files that actually exist in `public/`.
 - The static server allowlist is intentional. Do not expose `.txt` or `.json` files through it.
 - Preserve crisis detection before RAG and Ollama calls.
 - RAG is keyword retrieval with intent query expansion, not vector embeddings. Keep default references reviewed and concise.

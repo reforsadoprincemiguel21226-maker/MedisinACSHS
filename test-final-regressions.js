@@ -3,7 +3,7 @@ const { understandMessage } = require('./lib/understand.js');
 const { decide } = require('./lib/decide.js');
 const { mapKitItems } = require('./lib/map-kit.js');
 const fs = require('fs');
-const html = fs.readFileSync('./A.i asistant.html', 'utf8');
+const html = fs.readFileSync('./public/A.i asistant.html', 'utf8');
 
 function u(text) { return understandMessage(text); }
 function d(text) { const x=u(text); return {u:x,d:decide(x,text)}; }
@@ -40,7 +40,8 @@ assert(!/speakReply\(text\)/.test(userFn));
 const typingFn = html.match(/function showTyping\(\) \{[\s\S]*?\n\}/)?.[0] || '';
 assert(!/speakReply/.test(typingFn));
 assert(html.includes('How ARIA decided'));
-assert(html.includes('This summary shows the known facts and safety factors behind this reply, not private internal reasoning.'));
+assert(!html.includes('This summary shows the known facts and safety factors behind this reply, not private internal reasoning.'));
+assert(!html.includes('assessment-note'));
 assert(!html.includes('footer-note'));
 assert(!html.includes('Powered by MedisinACSHS AI - For informational purposes only'));
 console.log('final regression checks: PASS');

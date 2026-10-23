@@ -4,12 +4,13 @@
 <title>ARIA - AI Assistant</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<link rel="stylesheet" href="css/ai-assistant.css?v=aria-chat-3">
+<link rel="stylesheet" href="css/ai-assistant.css?v=aria-chat-4">
 <meta name="theme-color" content="#064c55">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="assets/images/icon-white-192.png">
+<link rel="stylesheet" href="css/press-feedback.css?v=1">
 </head>
 <body>
 <main class="assistant-page" aria-label="ARIA AI assistant page">
@@ -467,7 +468,7 @@ function buildAssessmentPanel(assessment) {
     details.className = 'assessment-panel';
 
     const summary = document.createElement('summary');
-    summary.innerHTML = '<span class="assessment-chevron" aria-hidden="true">›</span><span>How ARIA decided</span>'; 
+    summary.innerHTML = '<span class="assessment-chevron" aria-hidden="true">›</span><span>How ARIA decided</span>';
     details.appendChild(summary);
 
     const body = document.createElement('div');
@@ -513,11 +514,6 @@ function buildAssessmentPanel(assessment) {
         section.innerHTML = `<strong>Next useful detail</strong><p>${escapeHtml(assessment.nextBestQuestion)}</p>`;
         body.appendChild(section);
     }
-
-    const note = document.createElement('p');
-    note.className = 'assessment-note';
-    note.textContent = 'This summary shows the known facts and safety factors behind this reply, not private internal reasoning.';
-    body.appendChild(note);
 
     details.appendChild(body);
     return details;
@@ -670,5 +666,6 @@ window.addEventListener('beforeunload', shutdownVoiceFeatures);
 window.addEventListener('pagehide', shutdownVoiceFeatures);
 </script>
 <script src="assets/js/pwa-register.js"></script>
+<script src="assets/js/press-feedback.js?v=1"></script>
 </body>
 </html>

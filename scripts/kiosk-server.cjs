@@ -11,7 +11,14 @@ function serveStatic(req,res){
   const filePath=path.resolve(path.join(root,urlPath==='/'?'index.html':urlPath));
   if (filePath!==root && !filePath.startsWith(root+path.sep)) return res.writeHead(403).end('Forbidden');
   const ext=path.extname(filePath); if(!MIME[ext]) return res.writeHead(404).end('Not found');
-  fs.readFile(filePath,(err,data)=>{ if(err)return res.writeHead(404).end('Not found'); res.writeHead(200,{'Content-Type':MIME[ext]}); res.end(data); });
+  fs.readFile(filePath,(err,data)=>{
+    if(err)return res.writeHead(404).end('Not found');
+    res.writeHead(200,{
+      'Content-Type':MIME[ext],
+      'Cache-Control': ['.html','.css','.js','.webmanifest'].includes(ext) ? 'no-cache' : 'public, max-age=86400'
+    });
+    res.end(data);
+  });
 }
 const server=http.createServer((req,res)=>{
   const url=new URL(req.url,`http://${req.headers.host||'localhost'}`);

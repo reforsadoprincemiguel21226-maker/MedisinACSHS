@@ -62,7 +62,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .feature-button {
   position: relative;
   isolation: isolate;
-  overflow: hidden;
+  overflow: visible; /* Allow the inventory notification to sit outside the disc. */
   width: min(100%, clamp(100px, 18vw, 330px));
   aspect-ratio: 1;
   display: grid;
@@ -137,3 +137,19 @@ button, a { -webkit-tap-highlight-color: transparent; }
   .feature-button { width: min(100%, 24vh, 18vw); }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; } }
+
+/* USER TUNING — HOME INVENTORY RED DOT.
+   Adjust --badge-right and --badge-bottom. Positive right moves it LEFT;
+   positive bottom moves it UP. The dot sits at the LOWER RIGHT rim (reference). */
+.feature-button:has(.inventory-home-badge) { overflow: visible; }
+.inventory-home-badge {
+  --badge-right: 40px;
+  --badge-bottom: 20px;
+  position: absolute; z-index: 12;
+  right: var(--badge-right); bottom: var(--badge-bottom); top: auto;
+  width: clamp(20px, 2.4vw, 30px); height: clamp(20px, 2.4vw, 30px);
+  padding: 0; border: 0; border-radius: 50%;
+  background: #df2429; box-shadow: 0 2px 7px #00384080;
+  pointer-events: none;
+}
+.inventory-home-badge[hidden] { display: none; }

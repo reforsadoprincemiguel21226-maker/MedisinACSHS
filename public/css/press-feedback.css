@@ -1,0 +1,5 @@
+/* All kiosk action controls give a short brightened tap response. */
+button, a[href], [role="button"] { -webkit-tap-highlight-color: transparent; }
+button.aria-pressed, a.aria-pressed, [role="button"].aria-pressed { animation: aria-tap-feedback .20s ease-out !important; }
+@keyframes aria-tap-feedback { 0% { filter: brightness(1); } 35% { filter: brightness(1.5); } 100% { filter: brightness(1); } }
+@media (prefers-reduced-motion: reduce) { button.aria-pressed, a.aria-pressed, [role="button"].aria-pressed { animation: none !important; filter: brightness(1.18); } }

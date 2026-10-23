@@ -623,15 +623,6 @@ h1 {
     color: #2d6670;
 }
 
-.assessment-note {
-    margin: 0.55rem 0 0;
-    padding-top: 0.45rem;
-    border-top: 1px dashed rgba(0, 66, 75, 0.25);
-    color: #2a5f69;
-    font-size: 0.76rem;
-    line-height: 1.4;
-}
-
 /* ---------- Narrow screens (phones / portrait) ---------- */
 
 @media (max-width: 600px) {

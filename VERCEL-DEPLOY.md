@@ -55,4 +55,6 @@ The admin RAG document store uses local filesystem storage; Vercel function stor
 
 ## Local development
 
+`public/` is the single source of truth for browser files; do not edit duplicate root-level HTML/CSS/assets. This source archive intentionally excludes generated `node_modules/`; run `npm ci` once before local use.
+
 `npm start` runs `scripts/kiosk-server.cjs`, which serves the same `public/` frontend and the same `/api` handlers locally.
