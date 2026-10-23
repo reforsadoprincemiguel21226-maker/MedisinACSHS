@@ -129,7 +129,7 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
     height: 5px;
     padding: 3px;
     font-size: 10px;
-    transform: translate(50px, 0px);
+    transform: translate(0px, 0px);
   }
 
   /* MOBILE — RED EXPIRED BADGE */
