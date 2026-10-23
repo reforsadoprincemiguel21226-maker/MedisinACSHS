@@ -125,11 +125,11 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 
   /* MOBILE — YELLOW EXPIRING BADGE */
   .warning-badges .count-badge.expiring {
-    min-width: 10px;
-    height: 10px;
+    min-width: 5px;
+    height: 5px;
     padding: 3px;
     font-size: 10px;
-    transform: translate(5px, 0px);
+    transform: translate(50px, 0px);
   }
 
   /* MOBILE — RED EXPIRED BADGE */
