@@ -113,8 +113,8 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 
   /* MOBILE — WARNING ICON SIZE */
   .icon-button {
-    width: 34px;
-    height: 34px;
+    width: 40px;
+    height: 40px;
   }
 
   /* MOBILE — MOVE BOTH BADGES TOGETHER */
@@ -125,8 +125,8 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 
   /* MOBILE — YELLOW EXPIRING BADGE */
   .warning-badges .count-badge.expiring {
-    min-width: 5px;
-    height: 5px;
+    min-width: 17px;
+    height: 17px;
     padding: 3px;
     font-size: 10px;
     transform: translate(0px, 0px);
@@ -134,12 +134,12 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 
   /* MOBILE — RED EXPIRED BADGE */
   .warning-badges .count-badge.expired {
-    min-width: 10px;
-    height: 10px;
+    min-width: 17px;
+    height: 17px;
     padding: 3px;
     font-size: 10px;
     margin-left: -6px;
-    transform: translate(5px, 0px);
+    transform: translate(-2px, -10px);
   }
 
   .category-heading h2 { font-size: .9rem; }

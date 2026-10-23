@@ -153,3 +153,21 @@ button, a { -webkit-tap-highlight-color: transparent; }
   pointer-events: none;
 }
 .inventory-home-badge[hidden] { display: none; }
+
+/* =====================================
+   MOBILE — HOME INVENTORY WARNING DOT
+   Edit these values independently.
+   ===================================== */
+@media (max-width: 440px) {
+
+  .inventory-home-badge {
+    /* POSITION */
+    --badge-right: 30px;
+    --badge-bottom: 20px;
+
+    /* SIZE */
+    width: 25px;
+    height: 25px;
+  }
+
+}
